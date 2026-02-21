@@ -35,7 +35,6 @@ app.get('/api/vehicles/:id', (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-// Add this after your vehicle routes
 
 // POST - Create new booking
 app.post('/api/bookings', (req, res) => {
@@ -52,10 +51,16 @@ app.post('/api/bookings', (req, res) => {
       return;
     }
     
-    // Calculate days and total
+    // Calculate days safely (FIXED VERSION)
     const pickup = new Date(bookingData.pickupDate);
     const ret = new Date(bookingData.returnDate);
-    const days = Math.ceil((ret - pickup) / (1000 * 60 * 60 * 24)) + 1;
+    
+    // Convert dates to timestamps for safe calculation
+    const pickupTime = pickup.getTime();
+    const returnTime = ret.getTime();
+    const diffTime = Math.abs(returnTime - pickupTime);
+    const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    
     const totalAmount = days * vehicle.price_per_day;
     
     // Create booking object
@@ -84,6 +89,7 @@ app.post('/api/bookings', (req, res) => {
     });
     
   } catch (error: any) {
+    console.error('Booking error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -111,7 +117,67 @@ app.get('/api/bookings/:bookingNumber', (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-// IMPORTANT: Serve index.html for the root route
+
+// PUT - Update booking status (for staff dashboard)
+app.put('/api/bookings/:id/status', (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { status } = req.body;
+    
+    const updated = db.updateBookingStatus(id, status);
+    if (updated) {
+      res.json({ success: true, booking: updated });
+    } else {
+      res.status(404).json({ error: 'Booking not found' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST - Add new vehicle (admin)
+app.post('/api/vehicles', (req, res) => {
+  try {
+    const vehicleData = req.body;
+    const newVehicle = db.addVehicle(vehicleData);
+    res.status(201).json(newVehicle);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// PUT - Update vehicle (admin)
+app.put('/api/vehicles/:id', (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const updates = req.body;
+    const updated = db.updateVehicle(id, updates);
+    if (updated) {
+      res.json(updated);
+    } else {
+      res.status(404).json({ error: 'Vehicle not found' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE - Delete vehicle (admin)
+app.delete('/api/vehicles/:id', (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const deleted = db.deleteVehicle(id);
+    if (deleted) {
+      res.json({ success: true, message: 'Vehicle deleted' });
+    } else {
+      res.status(404).json({ error: 'Vehicle not found' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Serve index.html for the root route
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));
 });

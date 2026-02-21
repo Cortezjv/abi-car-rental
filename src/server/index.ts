@@ -51,11 +51,10 @@ app.post('/api/bookings', (req, res) => {
       return;
     }
     
-    // Calculate days safely (FIXED VERSION)
+    // Calculate days safely
     const pickup = new Date(bookingData.pickupDate);
     const ret = new Date(bookingData.returnDate);
     
-    // Convert dates to timestamps for safe calculation
     const pickupTime = pickup.getTime();
     const returnTime = ret.getTime();
     const diffTime = Math.abs(returnTime - pickupTime);
@@ -94,7 +93,7 @@ app.post('/api/bookings', (req, res) => {
   }
 });
 
-// GET - Get all bookings (for staff dashboard)
+// GET - Get all bookings
 app.get('/api/bookings', (req, res) => {
   try {
     const bookings = db.getBookings();
@@ -118,7 +117,7 @@ app.get('/api/bookings/:bookingNumber', (req, res) => {
   }
 });
 
-// PUT - Update booking status (for staff dashboard)
+// PUT - Update booking status
 app.put('/api/bookings/:id/status', (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -135,7 +134,7 @@ app.put('/api/bookings/:id/status', (req, res) => {
   }
 });
 
-// POST - Add new vehicle (admin)
+// POST - Add new vehicle
 app.post('/api/vehicles', (req, res) => {
   try {
     const vehicleData = req.body;
@@ -146,7 +145,7 @@ app.post('/api/vehicles', (req, res) => {
   }
 });
 
-// PUT - Update vehicle (admin)
+// PUT - Update vehicle
 app.put('/api/vehicles/:id', (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -162,7 +161,7 @@ app.put('/api/vehicles/:id', (req, res) => {
   }
 });
 
-// DELETE - Delete vehicle (admin)
+// DELETE - Delete vehicle
 app.delete('/api/vehicles/:id', (req, res) => {
   try {
     const id = parseInt(req.params.id);

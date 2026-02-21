@@ -1,0 +1,83 @@
+{
+  "vehicles": [
+    {
+      "id": 1,
+      "name": "Toyota Vitz",
+      "type": "car",
+      "price_per_day": 30,
+      "seats": 5,
+      "transmission": "manual",
+      "availability": true,
+      "image_url": "https://via.placeholder.com/300x200?text=Toyota+Vitz"
+    },
+    {
+      "id": 2,
+      "name": "Honda Fit",
+      "type": "car",
+      "price_per_day": 35,
+      "seats": 5,
+      "transmission": "automatic",
+      "availability": true,
+      "image_url": "https://via.placeholder.com/300x200?text=Honda+Fit"
+    },
+    {
+      "id": 3,
+      "name": "Toyota Hiace",
+      "type": "van",
+      "price_per_day": 80,
+      "seats": 15,
+      "transmission": "manual",
+      "availability": true,
+      "image_url": "https://via.placeholder.com/300x200?text=Toyota+Hiace"
+    },
+    {
+      "id": 4,
+      "name": "Nissan Urvan",
+      "type": "van",
+      "price_per_day": 75,
+      "seats": 12,
+      "transmission": "manual",
+      "availability": true,
+      "image_url": "https://via.placeholder.com/300x200?text=Nissan+Urvan"
+    },
+    {
+      "id": 5,
+      "name": "Suzuki Swift",
+      "type": "car",
+      "price_per_day": 28,
+      "seats": 5,
+      "transmission": "manual",
+      "availability": true,
+      "image_url": "https://via.placeholder.com/300x200?text=Suzuki+Swift"
+    },
+    {
+      "id": 6,
+      "name": "Mitsubishi Pajero",
+      "type": "suv",
+      "price_per_day": 120,
+      "seats": 7,
+      "transmission": "automatic",
+      "availability": true,
+      "image_url": "https://via.placeholder.com/300x200?text=Mitsubishi+Pajero"
+    }
+  ],
+  "bookings": [
+    {
+      "id": 1,
+      "bookingNumber": "BK1771645264153534",
+      "createdAt": "2026-02-21T03:41:04.159Z",
+      "vehicleId": 1,
+      "vehicleName": "Toyota Vitz",
+      "customerName": "John Vincent Cortez",
+      "customerEmail": "legendaryrequaza@gmail.com",
+      "customerPhone": "1234567890",
+      "licenseNumber": "1235567816282",
+      "pickupDate": "2026-02-22",
+      "returnDate": "2026-02-23",
+      "days": 2,
+      "totalAmount": 60,
+      "specialRequests": "",
+      "status": "confirmed"
+    }
+  ]
+}

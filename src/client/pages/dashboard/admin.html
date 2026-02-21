@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ABI Car Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Simple Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl font-bold text-blue-600">ABI Admin Dashboard</h1>
+                <a href="/" class="text-gray-600 hover:text-blue-600">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold mb-6">Vehicle Management</h2>
+        
+        <!-- Add Vehicle Button -->
+        <button id="addVehicleBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg mb-6 hover:bg-blue-700">
+            <i class="fas fa-plus mr-2"></i>Add New Vehicle
+        </button>
+
+        <!-- Vehicles List -->
+        <div id="vehiclesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full text-center py-8">
+                <p class="text-gray-600">Loading vehicles...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Add Vehicle Form (Hidden by default) -->
+    <div id="vehicleForm" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-96">
+            <h3 class="text-lg font-bold mb-4">Add New Vehicle</h3>
+            
+            <div class="mb-4">
+                <input type="text" id="name" placeholder="Vehicle Name" 
+                       class="w-full px-3 py-2 border rounded-lg mb-2">
+                <select id="type" class="w-full px-3 py-2 border rounded-lg mb-2">
+                    <option value="car">Car</option>
+                    <option value="van">Van</option>
+                    <option value="suv">SUV</option>
+                </select>
+                <input type="number" id="price" placeholder="Price per Day" 
+                       class="w-full px-3 py-2 border rounded-lg mb-2">
+                <input type="number" id="seats" placeholder="Number of Seats" 
+                       class="w-full px-3 py-2 border rounded-lg mb-2">
+                <select id="transmission" class="w-full px-3 py-2 border rounded-lg mb-2">
+                    <option value="manual">Manual</option>
+                    <option value="automatic">Automatic</option>
+                </select>
+            </div>
+            
+            <div class="flex justify-end space-x-2">
+                <button onclick="hideForm()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancel</button>
+                <button onclick="saveVehicle()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show/Hide Form
+        document.getElementById('addVehicleBtn').addEventListener('click', () => {
+            document.getElementById('vehicleForm').classList.remove('hidden');
+        });
+
+        window.hideForm = function() {
+            document.getElementById('vehicleForm').classList.add('hidden');
+            // Clear form
+            document.getElementById('name').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('seats').value = '';
+        }
+
+        // Load vehicles
+        async function loadVehicles() {
+            try {
+                const response = await fetch('/api/vehicles');
+                const vehicles = await response.json();
+                
+                const container = document.getElementById('vehiclesList');
+                
+                if (vehicles.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center py-8 text-gray-600">No vehicles found</div>';
+                    return;
+                }
+
+                container.innerHTML = vehicles.map(v => `
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h3 class="font-bold text-lg">${v.name}</h3>
+                        <p class="text-gray-600">Type: ${v.type}</p>
+                        <p class="text-gray-600">Price: $${v.price_per_day}/day</p>
+                        <p class="text-gray-600">Seats: ${v.seats}</p>
+                        <p class="text-gray-600">Transmission: ${v.transmission}</p>
+                        <div class="mt-4 flex space-x-2">
+                            <button class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button onclick="deleteVehicle(${v.id})" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Save vehicle
+        window.saveVehicle = async function() {
+            const vehicle = {
+                name: document.getElementById('name').value,
+                type: document.getElementById('type').value,
+                price_per_day: parseFloat(document.getElementById('price').value),
+                seats: parseInt(document.getElementById('seats').value),
+                transmission: document.getElementById('transmission').value,
+                image_url: 'https://via.placeholder.com/300x200?text=' + document.getElementById('name').value
+            };
+
+            try {
+                const response = await fetch('/api/vehicles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(vehicle)
+                });
+
+                if (response.ok) {
+                    hideForm();
+                    loadVehicles();
+                }
+            } catch (error) {
+                alert('Error saving vehicle');
+            }
+        }
+
+        // Delete vehicle
+        window.deleteVehicle = async function(id) {
+            if (!confirm('Delete this vehicle?')) return;
+            
+            try {
+                const response = await fetch(`/api/vehicles/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadVehicles();
+                }
+            } catch (error) {
+                alert('Error deleting vehicle');
+            }
+        }
+
+        // Load vehicles on page load
+        document.addEventListener('DOMContentLoaded', loadVehicles);
+    </script>
+</body>
+</html>

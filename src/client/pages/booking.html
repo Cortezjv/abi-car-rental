@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Book a Vehicle - ABI Car Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl font-bold text-blue-600">ABI Rentals</h1>
+                <div class="space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
+                    <a href="/pages/vehicles.html" class="text-gray-700 hover:text-blue-600">Vehicles</a>
+                    <a href="/pages/booking.html" class="text-blue-600 font-semibold">Book Now</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Book Your Vehicle</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Booking Form -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-semibold mb-6">Rental Details</h2>
+                    
+                    <form id="bookingForm" class="space-y-4">
+                        <!-- Vehicle Selection -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Select Vehicle</label>
+                            <select id="vehicleId" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">Choose a vehicle...</option>
+                            </select>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Pick-up Date</label>
+                                <input type="date" id="pickupDate" required 
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Return Date</label>
+                                <input type="date" id="returnDate" required 
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <!-- Customer Information -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Full Name</label>
+                                <input type="text" id="customerName" required 
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Email</label>
+                                <input type="email" id="customerEmail" required 
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                                <input type="tel" id="customerPhone" required 
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Driver's License</label>
+                                <input type="text" id="licenseNumber" required 
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <!-- Special Requests -->
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Special Requests (Optional)</label>
+                            <textarea id="specialRequests" rows="3" 
+                                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" 
+                                class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                            Complete Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Booking Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-lg p-6 sticky top-24">
+                    <h2 class="text-xl font-semibold mb-4">Booking Summary</h2>
+                    
+                    <!-- Selected Vehicle -->
+                    <div id="selectedVehicle" class="mb-4 p-3 bg-gray-50 rounded-lg">
+                        <p class="text-gray-500 text-sm">No vehicle selected</p>
+                    </div>
+
+                    <!-- Price Breakdown -->
+                    <div id="priceBreakdown" class="space-y-2 mb-4">
+                        <div class="flex justify-between text-gray-600">
+                            <span>Daily Rate:</span>
+                            <span id="dailyRate">$0</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Number of Days:</span>
+                            <span id="numberOfDays">0</span>
+                        </div>
+                        <div class="border-t pt-2 mt-2">
+                            <div class="flex justify-between font-bold text-lg">
+                                <span>Total:</span>
+                                <span id="totalPrice">$0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Insurance Info -->
+                    <div class="text-sm text-gray-500 mt-4 p-3 bg-blue-50 rounded-lg">
+                        <i class="fas fa-shield-alt text-blue-600 mr-2"></i>
+                        All bookings include comprehensive insurance coverage
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vehicles = [];
+        let selectedVehicle = null;
+
+        // Load vehicles on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadVehicles();
+            setupDatePickers();
+        });
+
+        // Load vehicles from API
+        async function loadVehicles() {
+            try {
+                const response = await fetch('/api/vehicles');
+                vehicles = await response.json();
+                
+                const select = document.getElementById('vehicleId');
+                select.innerHTML = '<option value="">Choose a vehicle...</option>' + 
+                    vehicles.map(v => `<option value="${v.id}">${v.name} - $${v.price_per_day}/day (${v.seats} seats)</option>`).join('');
+                
+                // Add event listener for vehicle selection
+                select.addEventListener('change', (e) => {
+                    const vehicleId = parseInt(e.target.value);
+                    selectedVehicle = vehicles.find(v => v.id === vehicleId);
+                    updateSummary();
+                });
+            } catch (error) {
+                console.error('Error loading vehicles:', error);
+            }
+        }
+
+        // Setup date pickers with min dates
+        function setupDatePickers() {
+            const today = new Date().toISOString().split('T')[0];
+            const pickupDate = document.getElementById('pickupDate');
+            const returnDate = document.getElementById('returnDate');
+            
+            pickupDate.min = today;
+            pickupDate.value = today;
+            
+            pickupDate.addEventListener('change', () => {
+                returnDate.min = pickupDate.value;
+                returnDate.value = pickupDate.value;
+                updateSummary();
+            });
+            
+            returnDate.addEventListener('change', updateSummary);
+        }
+
+        // Update booking summary
+        function updateSummary() {
+            if (!selectedVehicle) {
+                document.getElementById('selectedVehicle').innerHTML = 
+                    '<p class="text-gray-500 text-sm">No vehicle selected</p>';
+                return;
+            }
+
+            // Show selected vehicle
+            document.getElementById('selectedVehicle').innerHTML = `
+                <p class="font-semibold">${selectedVehicle.name}</p>
+                <p class="text-sm text-gray-600">${selectedVehicle.seats} seats • ${selectedVehicle.transmission}</p>
+            `;
+
+            // Calculate days
+            const pickup = new Date(document.getElementById('pickupDate').value);
+            const ret = new Date(document.getElementById('returnDate').value);
+            
+            if (pickup && ret && ret >= pickup) {
+                const days = Math.ceil((ret - pickup) / (1000 * 60 * 60 * 24)) + 1;
+                const total = days * selectedVehicle.price_per_day;
+                
+                document.getElementById('dailyRate').textContent = `$${selectedVehicle.price_per_day}`;
+                document.getElementById('numberOfDays').textContent = days;
+                document.getElementById('totalPrice').textContent = `$${total}`;
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedVehicle) {
+                alert('Please select a vehicle');
+                return;
+            }
+
+            const bookingData = {
+                vehicleId: selectedVehicle.id,
+                customerName: document.getElementById('customerName').value,
+                customerEmail: document.getElementById('customerEmail').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                licenseNumber: document.getElementById('licenseNumber').value,
+                pickupDate: document.getElementById('pickupDate').value,
+                returnDate: document.getElementById('returnDate').value,
+                specialRequests: document.getElementById('specialRequests').value
+            };
+
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`Booking successful! Your booking number is: ${result.bookingNumber}`);
+                    window.location.href = '/';
+                } else {
+                    alert('Booking failed. Please try again.');
+                }
+            } catch (error) {
+                alert('Error creating booking');
+            }
+        });
+    </script>
+</body>
+</html>

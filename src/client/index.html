@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABI Car & Van Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl font-bold text-blue-600">ABI Rentals</h1>
+                <div class="space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
+                    <a href="#vehicles" class="text-gray-700 hover:text-blue-600">Vehicles</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-blue-600 text-white py-16">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold mb-4">Welcome to ABI Car & Van Rental</h1>
+            <p class="text-xl mb-8">Quality vehicles at affordable prices</p>
+            <a href="#vehicles" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
+                Browse Our Vehicles
+            </a>
+        </div>
+    </section>
+
+    <!-- Vehicles Section -->
+    <section id="vehicles" class="py-16">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Our Fleet</h2>
+            <div id="vehicles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="text-center col-span-full">
+                    <p class="text-gray-600">Loading vehicles...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Fetch and display vehicles
+        fetch('/api/vehicles')
+            .then(res => res.json())
+            .then(vehicles => {
+                const container = document.getElementById('vehicles-container');
+                
+                container.innerHTML = vehicles.map(vehicle => `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="${vehicle.image_url}" alt="${vehicle.name}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="text-xl font-semibold mb-2">${vehicle.name}</h3>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-600">${vehicle.type}</span>
+                                <span class="text-gray-600">${vehicle.seats} seats</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-blue-600">$${vehicle.price_per_day}/day</span>
+                                <span class="text-sm ${vehicle.transmission === 'automatic' ? 'text-green-600' : 'text-gray-600'}">
+                                    ${vehicle.transmission}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(error => {
+                document.getElementById('vehicles-container').innerHTML = 
+                    '<p class="text-center col-span-full text-red-600">Error loading vehicles</p>';
+            });
+    </script>
+</body>
+</html>

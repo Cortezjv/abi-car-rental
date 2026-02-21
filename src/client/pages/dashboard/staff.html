@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Staff Dashboard - ABI Car Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <h1 class="text-xl font-bold text-blue-600">ABI Staff Dashboard</h1>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Welcome, Staff</span>
+                    <a href="/" class="text-gray-600 hover:text-blue-600">
+                        <i class="fas fa-home"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold">Today's Operations</h2>
+            <div class="flex space-x-2">
+                <button onclick="filterBookings('all')" class="px-4 py-2 bg-blue-600 text-white rounded-lg">All</button>
+                <button onclick="filterBookings('today')" class="px-4 py-2 bg-gray-200 rounded-lg">Today</button>
+                <button onclick="filterBookings('upcoming')" class="px-4 py-2 bg-gray-200 rounded-lg">Upcoming</button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-blue-100 rounded-full p-3 mr-4">
+                        <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Today's Pickups</p>
+                        <p id="todayPickups" class="text-2xl font-bold">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-green-100 rounded-full p-3 mr-4">
+                        <i class="fas fa-car text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Active Rentals</p>
+                        <p id="activeRentals" class="text-2xl font-bold">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-yellow-100 rounded-full p-3 mr-4">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Pending Returns</p>
+                        <p id="pendingReturns" class="text-2xl font-bold">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="bg-purple-100 rounded-full p-3 mr-4">
+                        <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-600">Today's Revenue</p>
+                        <p id="todayRevenue" class="text-2xl font-bold">$0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 border-b">
+                <h3 class="text-lg font-semibold">Recent Bookings</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking #</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pickup</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Return</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTableBody" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                Loading bookings...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Update Modal -->
+    <div id="statusModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-96">
+            <h3 class="text-lg font-bold mb-4">Update Booking Status</h3>
+            <select id="statusSelect" class="w-full px-3 py-2 border rounded-lg mb-4">
+                <option value="confirmed">Confirmed</option>
+                <option value="active">Active (Picked Up)</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeStatusModal()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancel</button>
+                <button onclick="updateStatus()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBookings = [];
+        let currentFilter = 'all';
+        let selectedBookingId = null;
+
+        // Load bookings on page load
+        document.addEventListener('DOMContentLoaded', loadBookings);
+
+        // Load bookings every 30 seconds (auto-refresh)
+        setInterval(loadBookings, 30000);
+
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/bookings');
+                const bookings = await response.json();
+                currentBookings = bookings;
+                displayBookings(bookings);
+                updateStats(bookings);
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        function displayBookings(bookings) {
+            const tbody = document.getElementById('bookingsTableBody');
+            
+            if (bookings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            No bookings found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = bookings.map(booking => {
+                const pickupDate = new Date(booking.pickupDate).toLocaleDateString();
+                const returnDate = new Date(booking.returnDate).toLocaleDateString();
+                
+                let statusColor = {
+                    'confirmed': 'bg-yellow-100 text-yellow-800',
+                    'active': 'bg-green-100 text-green-800',
+                    'completed': 'bg-gray-100 text-gray-800',
+                    'cancelled': 'bg-red-100 text-red-800'
+                }[booking.status] || 'bg-gray-100 text-gray-800';
+
+                return `
+                    <tr>
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-mono">${booking.bookingNumber}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium">${booking.customerName}</div>
+                            <div class="text-xs text-gray-500">${booking.customerPhone}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm">${booking.vehicleName || 'Vehicle'}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm">${pickupDate}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm">${returnDate}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full ${statusColor}">
+                                ${booking.status}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <button onclick="openStatusModal(${booking.id})" 
+                                    class="text-blue-600 hover:text-blue-900 mr-3">
+                                <i class="fas fa-edit"></i> Status
+                            </button>
+                            <button onclick="viewDetails('${booking.bookingNumber}')" 
+                                    class="text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateStats(bookings) {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Today's pickups
+            const todayPickups = bookings.filter(b => 
+                b.pickupDate === today && b.status !== 'cancelled'
+            ).length;
+            
+            // Active rentals
+            const activeRentals = bookings.filter(b => 
+                b.status === 'active'
+            ).length;
+            
+            // Pending returns (due today)
+            const pendingReturns = bookings.filter(b => 
+                b.returnDate === today && b.status === 'active'
+            ).length;
+            
+            // Today's revenue (completed today or active)
+            const todayRevenue = bookings
+                .filter(b => b.pickupDate === today && b.status !== 'cancelled')
+                .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+
+            document.getElementById('todayPickups').textContent = todayPickups;
+            document.getElementById('activeRentals').textContent = activeRentals;
+            document.getElementById('pendingReturns').textContent = pendingReturns;
+            document.getElementById('todayRevenue').textContent = `$${todayRevenue}`;
+        }
+
+        function filterBookings(filter) {
+            currentFilter = filter;
+            const buttons = document.querySelectorAll('button[onclick^="filterBookings"]');
+            buttons.forEach(b => b.classList.remove('bg-blue-600', 'text-white'));
+            buttons.forEach(b => b.classList.add('bg-gray-200'));
+            
+            event.target.classList.remove('bg-gray-200');
+            event.target.classList.add('bg-blue-600', 'text-white');
+            
+            let filtered = currentBookings;
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (filter === 'today') {
+                filtered = currentBookings.filter(b => b.pickupDate === today);
+            } else if (filter === 'upcoming') {
+                filtered = currentBookings.filter(b => b.pickupDate > today);
+            }
+            
+            displayBookings(filtered);
+        }
+
+        function openStatusModal(bookingId) {
+            selectedBookingId = bookingId;
+            document.getElementById('statusModal').classList.remove('hidden');
+        }
+
+        function closeStatusModal() {
+            document.getElementById('statusModal').classList.add('hidden');
+        }
+
+        async function updateStatus() {
+            const status = document.getElementById('statusSelect').value;
+            
+            try {
+                const response = await fetch(`/api/bookings/${selectedBookingId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                
+                if (response.ok) {
+                    closeStatusModal();
+                    loadBookings();
+                }
+            } catch (error) {
+                alert('Error updating status');
+            }
+        }
+
+        function viewDetails(bookingNumber) {
+            alert(`Viewing details for booking: ${bookingNumber}\n(This feature coming soon)`);
+        }
+    </script>
+</body>
+</html>

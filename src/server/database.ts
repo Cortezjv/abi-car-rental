@@ -11,42 +11,7 @@ class JsonDB {
     console.log('📁 Database path:', this.filePath);
     this.load();
   }
-// Add these methods inside the JsonDB class
 
-// Booking methods
-createBooking(booking: any) {
-  if (!this.data.bookings) {
-    this.data.bookings = [];
-  }
-  const newId = this.data.bookings.length > 0 
-    ? Math.max(...this.data.bookings.map((b: any) => b.id)) + 1 
-    : 1;
-  const newBooking = { 
-    id: newId, 
-    ...booking 
-  };
-  this.data.bookings.push(newBooking);
-  this.save();
-  return newBooking;
-}
-
-getBookings() {
-  return this.data.bookings || [];
-}
-
-getBookingByNumber(bookingNumber: string) {
-  return this.data.bookings?.find((b: any) => b.bookingNumber === bookingNumber);
-}
-
-updateBookingStatus(id: number, status: string) {
-  const index = this.data.bookings?.findIndex((b: any) => b.id === id);
-  if (index !== -1) {
-    this.data.bookings[index].status = status;
-    this.save();
-    return this.data.bookings[index];
-  }
-  return null;
-}
   private load() {
     try {
       // Create directory if it doesn't exist
@@ -144,15 +109,36 @@ updateBookingStatus(id: number, status: string) {
     return null;
   }
 
+  deleteVehicle(id: number) {
+    const index = this.data.vehicles.findIndex((v: any) => v.id === id);
+    if (index !== -1) {
+      this.data.vehicles.splice(index, 1);
+      this.save();
+      return true;
+    }
+    return false;
+  }
+
   // Booking methods
   createBooking(booking: any) {
-    const newId = Math.max(...this.data.bookings.map((b: any) => b.id), 0) + 1;
+    if (!this.data.bookings) {
+      this.data.bookings = [];
+    }
+    
+    // Generate new ID
+    const newId = this.data.bookings.length > 0 
+      ? Math.max(...this.data.bookings.map((b: any) => b.id)) + 1 
+      : 1;
+    
+    // Create booking with additional fields
     const newBooking = { 
-      id: newId, 
-      bookingNumber: 'BK' + Date.now(),
+      id: newId,
+      bookingNumber: 'BK' + Date.now() + Math.floor(Math.random() * 1000),
       createdAt: new Date().toISOString(),
+      status: 'confirmed',
       ...booking 
     };
+    
     this.data.bookings.push(newBooking);
     this.save();
     return newBooking;
@@ -160,6 +146,26 @@ updateBookingStatus(id: number, status: string) {
 
   getBookings() {
     return this.data.bookings || [];
+  }
+
+  getBookingByNumber(bookingNumber: string) {
+    return this.data.bookings?.find((b: any) => b.bookingNumber === bookingNumber);
+  }
+
+  updateBookingStatus(id: number, status: string) {
+    const index = this.data.bookings?.findIndex((b: any) => b.id === id);
+    if (index !== -1 && index !== undefined) {
+      this.data.bookings[index].status = status;
+      this.save();
+      return this.data.bookings[index];
+    }
+    return null;
+  }
+
+  getBookingsByDate(date: string) {
+    return this.data.bookings?.filter((b: any) => 
+      b.pickupDate === date || b.returnDate === date
+    ) || [];
   }
 }
 

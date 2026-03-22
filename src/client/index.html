@@ -2,370 +2,360 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ABI Car & Van Rental - Your Trusted Partner on the Road</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+    <style id="dynamic-styles">
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .hero-gradient {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        body { font-family: 'Inter', sans-serif; transition: all 0.3s ease; }
+        
+        /* Hero Slider Animation */
+        @keyframes slide {
+            0%, 20% { opacity: 1; }
+            25%, 45% { opacity: 0; }
+            50%, 70% { opacity: 1; }
+            75%, 95% { opacity: 0; }
+            100% { opacity: 1; }
         }
+        
+        .hero-slider img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            animation: slide 24s infinite;
+        }
+        
+        .hero-slider img:nth-child(1) { animation-delay: 0s; }
+        .hero-slider img:nth-child(2) { animation-delay: 6s; }
+        .hero-slider img:nth-child(3) { animation-delay: 12s; }
+        .hero-slider img:nth-child(4) { animation-delay: 18s; }
+        
+        /* Vehicle Card Hover */
         .vehicle-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
         }
         .vehicle-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-        .feature-icon {
-            transition: all 0.3s ease;
+        
+        /* Customer Image Circle */
+        .customer-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .feature-card:hover .feature-icon {
-            transform: scale(1.1);
-            background-color: #1e3c72;
+        
+        /* Responsive text sizing - Auto adjusts */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .nav-link {
+                font-size: 0.8rem !important;
+                padding: 0.4rem 0.8rem !important;
+            }
+            h1 { font-size: 1.8rem !important; }
+            h2 { font-size: 1.5rem !important; }
+            p { font-size: 0.9rem !important; }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-link {
+                font-size: 0.7rem !important;
+                padding: 0.3rem 0.6rem !important;
+            }
+            .dashboard-btn {
+                font-size: 0.7rem !important;
+                padding: 0.4rem 0.8rem !important;
+            }
+        }
+        
+        /* User Menu Dropdown */
+        .user-menu {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .user-menu-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 180px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1000;
+            margin-top: 10px;
+        }
+        
+        .user-menu:hover .user-menu-content {
+            display: block;
+        }
+        
+        .user-menu-item {
+            display: block;
+            padding: 10px 14px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+        
+        .user-menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-menu-item:hover {
+            background-color: #f8f8f8;
+            color: #1e3a8a;
+        }
+        
+        .dashboard-btn {
+            background: #1e3a8a;
             color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
+        
+        .dashboard-btn:hover {
+            background: #2563eb;
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(26, 67, 113, 0.5);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+        }
+        
+        .dashboard-btn i {
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .login-btn {
+            border: 1px solid #1e3a8a;
+            color: #1e3a8a;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+            background: transparent;
+        }
+        
+        .login-btn:hover {
+            background: #1e3a8a;
+            color: white;
         }
     </style>
 </head>
-<body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
+<body class="bg-gray-50" style="background-color: var(--bg-color, #f9fafb);">
+    <!-- Navigation - Simple Logo Only -->
+    <nav class="shadow-lg sticky top-0 z-50" style="background-color: var(--nav-bg, #ffffff);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <div class="flex-shrink-0 flex items-center">
-                    <i class="fas fa-car text-3xl text-blue-800 mr-2"></i>
-                    <div>
-                        <h1 class="text-2xl font-extrabold text-blue-900">ABI</h1>
-                        <p class="text-xs text-gray-500 -mt-1">Car & Van Rental</p>
+            <div class="nav-container flex justify-between items-center py-3 md:py-4">
+                <!-- Logo Only - No Text -->
+                <div class="flex-shrink-0">
+                    <i class="fas fa-car text-2xl md:text-3xl lg:text-4xl" style="color: var(--logo-icon-color, #1e3a8a);" id="logoIcon"></i>
+                </div>
+                
+                <!-- Navigation Links - Auto wrapping -->
+                <div class="nav-links flex items-center gap-1 md:gap-2 lg:gap-4">
+                    <a href="/" class="nav-link text-xs sm:text-sm md:text-base font-medium transition px-2 py-1 md:px-3 md:py-2" style="color: var(--nav-link-color, #4b5563);">Home</a>
+                    <a href="#vehicles" class="nav-link text-xs sm:text-sm md:text-base font-medium transition px-2 py-1 md:px-3 md:py-2" style="color: var(--nav-link-color, #4b5563);">Vehicles</a>
+                    <a href="#about" class="nav-link text-xs sm:text-sm md:text-base font-medium transition px-2 py-1 md:px-3 md:py-2" style="color: var(--nav-link-color, #4b5563);">About</a>
+                    <a href="#contact" class="nav-link text-xs sm:text-sm md:text-base font-medium transition px-2 py-1 md:px-3 md:py-2" style="color: var(--nav-link-color, #4b5563);">Contact</a>
+                    
+                    <!-- Dynamic User Section -->
+                    <div id="userSection" class="flex items-center">
+                        <!-- Will be populated by JavaScript -->
                     </div>
                 </div>
-                
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="/" class="text-gray-700 hover:text-blue-800 font-medium transition">Home</a>
-                    <a href="#vehicles" class="text-gray-700 hover:text-blue-800 font-medium transition">Vehicles</a>
-                    <a href="#about" class="text-gray-700 hover:text-blue-800 font-medium transition">About</a>
-                    <a href="#contact" class="text-gray-700 hover:text-blue-800 font-medium transition">Contact</a>
-                    <a href="/pages/booking.html" class="bg-blue-800 text-white px-6 py-2 rounded-full hover:bg-blue-900 transition font-semibold">
-                        Book Now
-                    </a>
-                    <a href="/pages/login.html" class="text-gray-600 hover:text-blue-800">
-                        <i class="fas fa-user-circle text-2xl"></i>
-                    </a>
-                </div>
-                
-                <!-- Mobile menu button -->
-                <div class="md:hidden flex items-center space-x-4">
-                    <a href="/pages/login.html" class="text-gray-600">
-                        <i class="fas fa-user-circle text-2xl"></i>
-                    </a>
-                    <button id="mobile-menu-button" class="text-gray-700 hover:text-blue-800 focus:outline-none">
-                        <i class="fas fa-bars text-2xl"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="/" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50 rounded-md">Home</a>
-                <a href="#vehicles" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50 rounded-md">Vehicles</a>
-                <a href="#about" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50 rounded-md">About</a>
-                <a href="#contact" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-800 hover:bg-gray-50 rounded-md">Contact</a>
-                <a href="/pages/booking.html" class="block px-3 py-2 text-base font-medium text-blue-800 bg-blue-50 rounded-md">Book Now</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
-                        Drive Your <span class="text-yellow-300">Dream</span> Journey
-                    </h1>
-                    <p class="text-xl mb-8 text-blue-100">Premium car and van rental services with 24/7 support. Choose from our wide range of well-maintained vehicles.</p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <a href="/pages/booking.html" class="btn-primary bg-yellow-400 text-blue-900 px-8 py-4 rounded-full font-bold text-lg text-center hover:bg-yellow-300 transition">
-                            <i class="fas fa-calendar-check mr-2"></i> Rent a Vehicle
-                        </a>
-                        <a href="#vehicles" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg text-center hover:bg-white hover:text-blue-900 transition">
-                            <i class="fas fa-car mr-2"></i> Browse Fleet
-                        </a>
-                    </div>
-                    
-                    <!-- Stats -->
-                    <div class="grid grid-cols-3 gap-4 mt-12">
+    <!-- Hero Section with Dynamic Slider -->
+    <section class="relative h-[350px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden" style="background-color: var(--hero-bg, #1e3a8a);">
+        <!-- Slider Images -->
+        <div class="hero-slider absolute inset-0" id="heroSlider">
+            <!-- Images will be inserted here dynamically -->
+        </div>
+        
+        <!-- Dark Overlay -->
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 h-full flex items-center">
+            <div class="text-white max-w-3xl">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold mb-3 md:mb-4 lg:mb-6 leading-tight" id="heroTitle">
+                    Drive Your Dream Journey
+                </h1>
+                <p class="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mb-4 md:mb-6 lg:mb-8 text-gray-200" id="heroSubtitle">
+                    Premium car and van rental services with 24/7 support
+                </p>
+                
+                <!-- Quick Search Bar -->
+                <div class="bg-white rounded-lg p-3 md:p-4 max-w-2xl">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4">
                         <div>
-                            <div class="text-3xl font-bold text-yellow-300">50+</div>
-                            <div class="text-sm text-blue-200">Vehicles</div>
+                            <label class="block text-xs text-gray-600 mb-1">Pickup</label>
+                            <input type="date" id="heroPickup" class="w-full px-2 md:px-3 py-1.5 md:py-2 text-xs sm:text-sm border rounded-lg text-gray-800">
                         </div>
                         <div>
-                            <div class="text-3xl font-bold text-yellow-300">1000+</div>
-                            <div class="text-sm text-blue-200">Happy Clients</div>
+                            <label class="block text-xs text-gray-600 mb-1">Return</label>
+                            <input type="date" id="heroReturn" class="w-full px-2 md:px-3 py-1.5 md:py-2 text-xs sm:text-sm border rounded-lg text-gray-800">
                         </div>
-                        <div>
-                            <div class="text-3xl font-bold text-yellow-300">24/7</div>
-                            <div class="text-sm text-blue-200">Support</div>
+                        <div class="flex items-end">
+                            <button onclick="quickSearch()" class="w-full text-xs sm:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg transition" 
+                                    style="background-color: var(--btn-bg, #1e3a8a); color: var(--btn-text, #ffffff);">
+                                <i class="fas fa-search mr-1"></i>Search
+                            </button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Hero Image -->
-                <div class="hidden md:block">
-                    <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
-                         alt="Luxury car" class="rounded-2xl shadow-2xl">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Search/Booking Bar -->
-    <section class="-mt-8 relative z-10">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="bg-white rounded-2xl shadow-2xl p-6">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-3 md:gap-6 lg:gap-8 mt-6 md:mt-8 lg:mt-12">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Pickup Location</label>
-                        <div class="relative">
-                            <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400"></i>
-                            <input type="text" placeholder="City or Airport" class="w-full pl-10 pr-3 py-2 border rounded-lg">
-                        </div>
+                        <div class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold" style="color: var(--stat-color, #fbbf24);" id="statVehicles">50+</div>
+                        <div class="text-xs sm:text-sm text-gray-300">Vehicles</div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Pickup Date</label>
-                        <div class="relative">
-                            <i class="fas fa-calendar absolute left-3 top-3 text-gray-400"></i>
-                            <input type="date" id="quickPickup" class="w-full pl-10 pr-3 py-2 border rounded-lg">
-                        </div>
+                        <div class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold" style="color: var(--stat-color, #fbbf24);" id="statCustomers">1000+</div>
+                        <div class="text-xs sm:text-sm text-gray-300">Happy Clients</div>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Return Date</label>
-                        <div class="relative">
-                            <i class="fas fa-calendar-check absolute left-3 top-3 text-gray-400"></i>
-                            <input type="date" id="quickReturn" class="w-full pl-10 pr-3 py-2 border rounded-lg">
-                        </div>
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="quickSearch()" class="btn-primary w-full bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition">
-                            <i class="fas fa-search mr-2"></i> Search
-                        </button>
+                        <div class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold" style="color: var(--stat-color, #fbbf24);" id="statYears">10+</div>
+                        <div class="text-xs sm:text-sm text-gray-300">Years</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="py-20">
+    <!-- Featured Vehicles Section -->
+    <section id="vehicles" class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: var(--section-bg, #ffffff);">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Choose ABI Rentals?</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Experience the best in class service with our premium features</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Feature 1 -->
-                <div class="feature-card bg-white p-8 rounded-xl shadow-lg text-center">
-                    <div class="feature-icon w-20 h-20 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Fully Insured</h3>
-                    <p class="text-gray-600">Comprehensive coverage for peace of mind on every journey</p>
-                </div>
-                
-                <!-- Feature 2 -->
-                <div class="feature-card bg-white p-8 rounded-xl shadow-lg text-center">
-                    <div class="feature-icon w-20 h-20 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">24/7 Support</h3>
-                    <p class="text-gray-600">Round-the-clock roadside assistance and customer service</p>
-                </div>
-                
-                <!-- Feature 3 -->
-                <div class="feature-card bg-white p-8 rounded-xl shadow-lg text-center">
-                    <div class="feature-icon w-20 h-20 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                        <i class="fas fa-wifi"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Free WiFi</h3>
-                    <p class="text-gray-600">Stay connected with complimentary WiFi in all vehicles</p>
-                </div>
-                
-                <!-- Feature 4 -->
-                <div class="feature-card bg-white p-8 rounded-xl shadow-lg text-center">
-                    <div class="feature-icon w-20 h-20 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
-                        <i class="fas fa-tag"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Best Prices</h3>
-                    <p class="text-gray-600">Competitive rates with no hidden charges or surprises</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Vehicles Section -->
-    <section id="vehicles" class="py-20 bg-gray-100">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold text-gray-900 mb-4">Our Fleet</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Choose from our wide selection of well-maintained vehicles</p>
-            </div>
-            
-            <!-- Vehicle Filters -->
-            <div class="flex flex-wrap justify-center gap-4 mb-12">
-                <button onclick="filterVehicles('all')" class="filter-btn active px-6 py-2 bg-blue-800 text-white rounded-full font-semibold">All</button>
-                <button onclick="filterVehicles('car')" class="filter-btn px-6 py-2 bg-white text-gray-700 rounded-full font-semibold hover:bg-blue-100">Cars</button>
-                <button onclick="filterVehicles('van')" class="filter-btn px-6 py-2 bg-white text-gray-700 rounded-full font-semibold hover:bg-blue-100">Vans</button>
-                <button onclick="filterVehicles('suv')" class="filter-btn px-6 py-2 bg-white text-gray-700 rounded-full font-semibold hover:bg-blue-100">SUVs</button>
+            <div class="text-center mb-6 md:mb-10 lg:mb-16">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-4" style="color: var(--heading-color, #111827);" id="featuredTitle">Featured Vehicles</h2>
+                <p class="text-sm sm:text-base md:text-lg lg:text-xl" style="color: var(--text-color, #4b5563);" id="featuredSubtitle">Check out our most popular vehicles</p>
             </div>
             
             <!-- Vehicle Grid -->
-            <div id="vehicles-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Vehicles will be loaded here -->
-                <div class="text-center col-span-full py-12">
-                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-800 border-t-transparent"></div>
-                    <p class="mt-4 text-gray-600">Loading vehicles...</p>
-                </div>
+            <div id="featuredVehicles" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+                <!-- Will be populated with exactly 3 vehicles -->
+            </div>
+            
+            <div class="text-center mt-6 md:mt-8 lg:mt-12">
+                <a href="/pages/vehicles.html" class="inline-block text-sm sm:text-base px-5 md:px-6 lg:px-8 py-2 md:py-2.5 lg:py-3 rounded-lg font-semibold transition"
+                   style="background-color: var(--btn-bg, #1e3a8a); color: var(--btn-text, #ffffff);">
+                    View All Vehicles
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customers Section -->
+    <section class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: var(--testimonial-bg, #f3f4f6);">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-6 md:mb-10 lg:mb-16">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-4" style="color: var(--heading-color, #111827);" id="testimonialTitle">What Our Customers Say</h2>
+                <p class="text-sm sm:text-base md:text-lg lg:text-xl" style="color: var(--text-color, #4b5563);" id="testimonialSubtitle">Real experiences from real customers</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8" id="customerTestimonials">
+                <!-- Will be populated from database -->
             </div>
         </div>
     </section>
 
     <!-- About Section -->
-    <section id="about" class="py-20">
+    <section id="about" class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: var(--section-bg, #ffffff);">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center">
                 <div>
-                    <h2 class="text-4xl font-bold text-gray-900 mb-6">About ABI Rentals</h2>
-                    <p class="text-lg text-gray-600 mb-6">With over 10 years of experience in the car rental industry, ABI Car & Van Rental has established itself as a trusted name for quality vehicles and exceptional service.</p>
-                    <p class="text-lg text-gray-600 mb-8">Our commitment to customer satisfaction and well-maintained fleet ensures that every journey with us is safe, comfortable, and enjoyable.</p>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4 lg:mb-6" style="color: var(--heading-color, #111827);" id="aboutTitle">About ABI Rentals</h2>
+                    <p class="text-sm sm:text-base md:text-lg mb-3 md:mb-4 lg:mb-6" style="color: var(--text-color, #4b5563);" id="aboutText1">
+                        With over 10 years of experience in the car rental industry, ABI Car & Van Rental has established itself as a trusted name for quality vehicles and exceptional service.
+                    </p>
+                    <p class="text-sm sm:text-base md:text-lg mb-4 md:mb-6 lg:mb-8" style="color: var(--text-color, #4b5563);" id="aboutText2">
+                        Our commitment to customer satisfaction and well-maintained fleet ensures that every journey with us is safe, comfortable, and enjoyable.
+                    </p>
                     
-                    <div class="space-y-4">
+                    <div class="space-y-2 md:space-y-3 lg:space-y-4">
                         <div class="flex items-center">
-                            <i class="fas fa-check-circle text-blue-800 text-2xl mr-4"></i>
-                            <span class="text-gray-700">Professional and friendly staff</span>
+                            <i class="fas fa-check-circle text-lg sm:text-xl md:text-2xl mr-2 md:mr-3 lg:mr-4" style="color: var(--accent-color, #1e3a8a);"></i>
+                            <span class="text-sm sm:text-base" style="color: var(--text-color, #4b5563);">Professional and friendly staff</span>
                         </div>
                         <div class="flex items-center">
-                            <i class="fas fa-check-circle text-blue-800 text-2xl mr-4"></i>
-                            <span class="text-gray-700">Regularly serviced and sanitized vehicles</span>
+                            <i class="fas fa-check-circle text-lg sm:text-xl md:text-2xl mr-2 md:mr-3 lg:mr-4" style="color: var(--accent-color, #1e3a8a);"></i>
+                            <span class="text-sm sm:text-base" style="color: var(--text-color, #4b5563);">Regularly serviced and sanitized vehicles</span>
                         </div>
                         <div class="flex items-center">
-                            <i class="fas fa-check-circle text-blue-800 text-2xl mr-4"></i>
-                            <span class="text-gray-700">Flexible rental periods and competitive rates</span>
+                            <i class="fas fa-check-circle text-lg sm:text-xl md:text-2xl mr-2 md:mr-3 lg:mr-4" style="color: var(--accent-color, #1e3a8a);"></i>
+                            <span class="text-sm sm:text-base" style="color: var(--text-color, #4b5563);">Flexible rental periods</span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-2 md:gap-3 lg:gap-4">
                     <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                         class="rounded-lg shadow-lg h-48 w-full object-cover">
+                         class="rounded-lg shadow-lg h-28 sm:h-32 md:h-40 lg:h-48 w-full object-cover">
                     <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                         class="rounded-lg shadow-lg h-48 w-full object-cover mt-8">
-                    <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                         class="rounded-lg shadow-lg h-48 w-full object-cover">
-                    <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
-                         class="rounded-lg shadow-lg h-48 w-full object-cover -mt-8">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
-    <section class="py-20 bg-blue-800 text-white">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4">What Our Customers Say</h2>
-                <p class="text-xl text-blue-200">Trusted by thousands of happy customers</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-blue-700 p-8 rounded-xl">
-                    <i class="fas fa-star text-yellow-300 mb-4"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <p class="text-lg italic mt-4 mb-6">"Excellent service! The car was clean and well-maintained. The staff was very helpful and professional."</p>
-                    <div class="font-bold">- John Smith</div>
-                </div>
-                
-                <div class="bg-blue-700 p-8 rounded-xl">
-                    <i class="fas fa-star text-yellow-300 mb-4"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <p class="text-lg italic mt-4 mb-6">"Great experience with ABI Rentals. The booking process was smooth and the prices are very reasonable."</p>
-                    <div class="font-bold">- Sarah Johnson</div>
-                </div>
-                
-                <div class="bg-blue-700 p-8 rounded-xl">
-                    <i class="fas fa-star text-yellow-300 mb-4"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <p class="text-lg italic mt-4 mb-6">"I rented a van for a family trip and it was perfect. Spacious, clean, and the pickup/return was hassle-free."</p>
-                    <div class="font-bold">- Mike Wilson</div>
+                         class="rounded-lg shadow-lg h-28 sm:h-32 md:h-40 lg:h-48 w-full object-cover mt-4 md:mt-6 lg:mt-8">
+                    <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         class="rounded-lg shadow-lg h-28 sm:h-32 md:h-40 lg:h-48 w-full object-cover">
+                    <img src="https://images.unsplash.com/photo-1556189250-72ba954cfc2b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         class="rounded-lg shadow-lg h-28 sm:h-32 md:h-40 lg:h-48 w-full object-cover -mt-4 md:-mt-6 lg:-mt-8">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-20">
+    <section id="contact" class="py-10 sm:py-12 md:py-16 lg:py-20" style="background-color: var(--contact-bg, #f3f4f6);">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
                 <div>
-                    <h2 class="text-4xl font-bold text-gray-900 mb-6">Get In Touch</h2>
-                    <p class="text-lg text-gray-600 mb-8">Have questions? We're here to help 24/7.</p>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4 lg:mb-6" style="color: var(--heading-color, #111827);" id="contactTitle">Get In Touch</h2>
+                    <p class="text-sm sm:text-base md:text-lg mb-4 md:mb-6 lg:mb-8" style="color: var(--text-color, #4b5563);" id="contactText">Have questions? We're here to help 24/7.</p>
                     
-                    <div class="space-y-6">
-                        <div class="flex items-center">
-                            <i class="fas fa-phone-alt text-2xl text-blue-800 w-12"></i>
-                            <div>
-                                <div class="font-semibold">Phone</div>
-                                <div class="text-gray-600">+123 456 7890</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-envelope text-2xl text-blue-800 w-12"></i>
-                            <div>
-                                <div class="font-semibold">Email</div>
-                                <div class="text-gray-600">info@abirentals.com</div>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <i class="fas fa-map-marker-alt text-2xl text-blue-800 w-12"></i>
-                            <div>
-                                <div class="font-semibold">Location</div>
-                                <div class="text-gray-600">123 Business Ave, City, 12345</div>
-                            </div>
-                        </div>
+                    <div class="space-y-3 md:space-y-4 lg:space-y-6" id="contactInfo">
+                        <!-- Dynamic from database -->
                     </div>
                 </div>
                 
-                <div class="bg-white p-8 rounded-xl shadow-lg">
-                    <h3 class="text-2xl font-bold mb-6">Send Us a Message</h3>
-                    <form id="contactForm" class="space-y-4">
-                        <input type="text" placeholder="Your Name" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-800">
-                        <input type="email" placeholder="Your Email" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-800">
-                        <textarea rows="4" placeholder="Your Message" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-800"></textarea>
-                        <button type="submit" class="btn-primary w-full bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition">
+                <div class="bg-white p-5 md:p-6 lg:p-8 rounded-xl shadow-lg">
+                    <h3 class="text-lg md:text-xl lg:text-2xl font-bold mb-3 md:mb-4 lg:mb-6" style="color: var(--heading-color, #111827);">Send Us a Message</h3>
+                    <form id="contactForm" class="space-y-3 md:space-y-4">
+                        <input type="text" placeholder="Your Name" class="w-full px-3 md:px-4 py-2 md:py-2.5 lg:py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-800">
+                        <input type="email" placeholder="Your Email" class="w-full px-3 md:px-4 py-2 md:py-2.5 lg:py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-800">
+                        <textarea rows="3" placeholder="Your Message" class="w-full px-3 md:px-4 py-2 md:py-2.5 lg:py-3 text-sm border rounded-lg focus:ring-2 focus:ring-blue-800"></textarea>
+                        <button type="submit" class="w-full text-sm md:text-base px-4 md:px-5 lg:px-6 py-2 md:py-2.5 lg:py-3 rounded-lg font-semibold transition"
+                                style="background-color: var(--btn-bg, #1e3a8a); color: var(--btn-text, #ffffff);">
                             Send Message
                         </button>
                     </form>
@@ -375,145 +365,335 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
+    <footer class="py-6 md:py-8 lg:py-12" style="background-color: var(--footer-bg, #111827); color: var(--footer-text, #ffffff);">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
                 <div>
-                    <div class="flex items-center mb-4">
-                        <i class="fas fa-car text-2xl text-blue-400 mr-2"></i>
-                        <span class="text-xl font-bold">ABI Rentals</span>
+                    <div class="flex items-center mb-2 md:mb-3 lg:mb-4">
+                        <i class="fas fa-car text-lg md:text-xl lg:text-2xl mr-2" style="color: var(--footer-accent, #60a5fa);"></i>
+                        <span class="text-sm md:text-base lg:text-xl font-bold" id="footerLogo">ABI Rentals</span>
                     </div>
-                    <p class="text-gray-400 text-sm">Your trusted partner for quality car and van rentals.</p>
+                    <p class="text-xs md:text-sm" style="color: var(--footer-text-muted, #9ca3af);" id="footerAbout">
+                        Your trusted partner for quality car and van rentals.
+                    </p>
                 </div>
                 
                 <div>
-                    <h4 class="font-bold mb-4">Quick Links</h4>
-                    <ul class="space-y-2 text-gray-400">
+                    <h4 class="text-sm md:text-base font-bold mb-2 md:mb-3 lg:mb-4">Quick Links</h4>
+                    <ul class="space-y-1 md:space-y-2 text-xs md:text-sm" style="color: var(--footer-text-muted, #9ca3af);">
                         <li><a href="/" class="hover:text-white transition">Home</a></li>
                         <li><a href="#vehicles" class="hover:text-white transition">Vehicles</a></li>
-                        <li><a href="/pages/booking.html" class="hover:text-white transition">Book Now</a></li>
+                        <li><a href="/pages/vehicles.html" class="hover:text-white transition">Browse</a></li>
                         <li><a href="#contact" class="hover:text-white transition">Contact</a></li>
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="font-bold mb-4">Services</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition">Car Rental</a></li>
-                        <li><a href="#" class="hover:text-white transition">Van Rental</a></li>
-                        <li><a href="#" class="hover:text-white transition">Long-term Leasing</a></li>
-                        <li><a href="#" class="hover:text-white transition">Airport Transfer</a></li>
+                    <h4 class="text-sm md:text-base font-bold mb-2 md:mb-3 lg:mb-4">Contact Info</h4>
+                    <ul class="space-y-1 md:space-y-2 text-xs md:text-sm" id="footerContact" style="color: var(--footer-text-muted, #9ca3af);">
+                        <!-- Dynamic from database -->
                     </ul>
                 </div>
                 
                 <div>
-                    <h4 class="font-bold mb-4">Follow Us</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white text-2xl"><i class="fab fa-linkedin"></i></a>
+                    <h4 class="text-sm md:text-base font-bold mb-2 md:mb-3 lg:mb-4">Follow Us</h4>
+                    <div class="flex space-x-2 md:space-x-3 lg:space-x-4" id="socialLinks">
+                        <!-- Dynamic from database -->
                     </div>
                 </div>
             </div>
             
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-                <p>&copy; 2026 ABI Car & Van Rental. All rights reserved.</p>
+            <div class="border-t border-gray-800 mt-4 md:mt-6 lg:mt-8 pt-3 md:pt-4 lg:pt-6 text-center text-xs md:text-sm" style="color: var(--footer-text-muted, #9ca3af);">
+                <p id="copyright">&copy; 2026 ABI Car & Van Rental. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        });
+        // ========== GLOBAL VARIABLES ==========
+        let content = {};
+        let vehicles = [];
+        let currentUser = null;
 
-        // Load vehicles
-        async function loadVehicles() {
-            try {
-                const response = await fetch('/api/vehicles');
-                const vehicles = await response.json();
-                displayVehicles(vehicles);
-            } catch (error) {
-                console.error('Error loading vehicles:', error);
-                document.getElementById('vehicles-container').innerHTML = `
-                    <div class="text-center col-span-full py-12">
-                        <p class="text-red-600">Error loading vehicles. Please try again.</p>
+        // ========== CHECK LOGIN STATUS ==========
+        (function checkAuth() {
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+            
+            if (userStr && token) {
+                try {
+                    currentUser = JSON.parse(userStr);
+                } catch (e) {
+                    currentUser = null;
+                }
+            }
+            updateUserSection();
+        })();
+
+        // ========== UPDATE USER SECTION ==========
+        function updateUserSection() {
+            const userSection = document.getElementById('userSection');
+            
+            if (currentUser) {
+                // Get dashboard URL based on role
+                let dashboardUrl = '/pages/dashboard/client.html';
+                let dashboardText = 'My Dashboard';
+                let dashboardIcon = 'tachometer-alt';
+                
+                if (currentUser.role === 'admin') {
+                    dashboardUrl = '/pages/dashboard/admin.html';
+                    dashboardText = 'Admin';
+                    dashboardIcon = 'user-shield';
+                } else if (currentUser.role === 'staff') {
+                    dashboardUrl = '/pages/dashboard/staff.html';
+                    dashboardText = 'Staff';
+                    dashboardIcon = 'user-tie';
+                }
+                
+                userSection.innerHTML = `
+                    <div class="user-menu">
+                        <a href="${dashboardUrl}" class="dashboard-btn">
+                            <i class="fas fa-${dashboardIcon}"></i>
+                            ${dashboardText}
+                        </a>
+                        <div class="user-menu-content">
+                            <a href="${dashboardUrl}" class="user-menu-item">
+                                <i class="fas fa-${dashboardIcon}" style="width: 18px;"></i>
+                                Dashboard
+                            </a>
+                            <a href="/pages/profile.html" class="user-menu-item">
+                                <i class="fas fa-user-circle" style="width: 18px;"></i>
+                                Profile
+                            </a>
+                            <a href="#" onclick="logout()" class="user-menu-item" style="color: #dc2626;">
+                                <i class="fas fa-sign-out-alt" style="width: 18px;"></i>
+                                Logout
+                            </a>
+                        </div>
                     </div>
+                `;
+            } else {
+                userSection.innerHTML = `
+                    <a href="/pages/login.html" class="login-btn">
+                        <i class="fas fa-key mr-1"></i>
+                        Login / Register
+                    </a>
                 `;
             }
         }
 
-        function displayVehicles(vehicles) {
-            const container = document.getElementById('vehicles-container');
+        window.logout = function() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            currentUser = null;
+            updateUserSection();
+            window.location.href = '/';
+        };
+
+        // ========== LOAD CONTENT FROM DATABASE ==========
+        async function loadContent() {
+            try {
+                const response = await fetch('/api/content');
+                content = await response.json();
+                applyContent();
+            } catch (error) {
+                console.error('Error loading content:', error);
+            }
+        }
+
+        // ========== APPLY CONTENT TO PAGE ==========
+        function applyContent() {
+            // Hero section
+            if (content.hero) {
+                document.getElementById('heroTitle').textContent = content.hero.title || 'Drive Your Dream Journey';
+                document.getElementById('heroSubtitle').textContent = content.hero.subtitle || 'Premium car and van rental services with 24/7 support';
+                
+                // Hero images
+                const slider = document.getElementById('heroSlider');
+                if (content.hero.carImages && content.hero.carImages.length > 0) {
+                    slider.innerHTML = content.hero.carImages.map(img => 
+                        `<img src="${img.url}" alt="Hero Car">`
+                    ).join('');
+                } else {
+                    slider.innerHTML = `
+                        <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80">
+                        <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80">
+                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80">
+                        <img src="https://images.unsplash.com/photo-1556189250-72ba954cfc2b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80">
+                    `;
+                }
+            }
             
-            if (!vehicles || vehicles.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center col-span-full py-12">
-                        <p class="text-gray-600">No vehicles available at the moment.</p>
+            // Stats
+            if (content.stats) {
+                document.getElementById('statVehicles').textContent = content.stats.vehicles || '50+';
+                document.getElementById('statCustomers').textContent = content.stats.customers || '1000+';
+                document.getElementById('statYears').textContent = content.stats.years || '10+';
+            }
+            
+            // Featured section titles
+            if (content.featured) {
+                document.getElementById('featuredTitle').textContent = content.featured.title || 'Featured Vehicles';
+                document.getElementById('featuredSubtitle').textContent = content.featured.subtitle || 'Check out our most popular vehicles';
+            }
+            
+            // Testimonials
+            if (content.testimonials && content.testimonials.length > 0) {
+                displayTestimonials(content.testimonials);
+            } else {
+                displayTestimonials([
+                    {
+                        image: 'https://randomuser.me/api/portraits/women/44.jpg',
+                        name: 'Maria Santos',
+                        role: 'Business Owner',
+                        rating: 5,
+                        text: 'Excellent service! The van was clean and well-maintained.'
+                    },
+                    {
+                        image: 'https://randomuser.me/api/portraits/men/32.jpg',
+                        name: 'John Reyes',
+                        role: 'Tourist',
+                        rating: 5,
+                        text: 'Smooth booking process and friendly staff.'
+                    },
+                    {
+                        image: 'https://randomuser.me/api/portraits/women/68.jpg',
+                        name: 'Anna Cruz',
+                        role: 'Corporate Client',
+                        rating: 5,
+                        text: 'Professional and reliable service.'
+                    }
+                ]);
+            }
+            
+            // About section
+            if (content.about) {
+                document.getElementById('aboutTitle').textContent = content.about.title || 'About ABI Rentals';
+                document.getElementById('aboutText1').textContent = content.about.text1 || 'With over 10 years of experience...';
+                document.getElementById('aboutText2').textContent = content.about.text2 || 'Our commitment to customer satisfaction...';
+            }
+            
+            // Contact section
+            if (content.contact) {
+                document.getElementById('contactTitle').textContent = content.contact.title || 'Get In Touch';
+                document.getElementById('contactText').textContent = content.contact.text || 'Have questions? We\'re here to help 24/7.';
+                
+                const contactInfo = document.getElementById('contactInfo');
+                contactInfo.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-phone-alt text-lg md:text-xl lg:text-2xl mr-2 md:mr-3 lg:mr-4" style="color: var(--accent-color, #1e3a8a);"></i>
+                        <div>
+                            <div class="text-xs md:text-sm font-semibold">Phone</div>
+                            <div class="text-xs md:text-sm" style="color: var(--text-color, #4b5563);">${content.contact.phone || '+63 912 345 6789'}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-envelope text-lg md:text-xl lg:text-2xl mr-2 md:mr-3 lg:mr-4" style="color: var(--accent-color, #1e3a8a);"></i>
+                        <div>
+                            <div class="text-xs md:text-sm font-semibold">Email</div>
+                            <div class="text-xs md:text-sm" style="color: var(--text-color, #4b5563);">${content.contact.email || 'info@abirentals.com'}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-map-marker-alt text-lg md:text-xl lg:text-2xl mr-2 md:mr-3 lg:mr-4" style="color: var(--accent-color, #1e3a8a);"></i>
+                        <div>
+                            <div class="text-xs md:text-sm font-semibold">Address</div>
+                            <div class="text-xs md:text-sm" style="color: var(--text-color, #4b5563);">${content.contact.address || '123 Business Ave, City'}</div>
+                        </div>
                     </div>
                 `;
-                return;
             }
+            
+            // Footer
+            if (content.footer) {
+                document.getElementById('footerAbout').textContent = content.footer.about || 'Your trusted partner for quality car and van rentals.';
+                document.getElementById('footerLogo').textContent = content.footer.logo || 'ABI Rentals';
+                
+                const footerContact = document.getElementById('footerContact');
+                footerContact.innerHTML = `
+                    <li><i class="fas fa-phone mr-2"></i> ${content.footer.phone || '+63 912 345 6789'}</li>
+                    <li><i class="fas fa-envelope mr-2"></i> ${content.footer.email || 'info@abirentals.com'}</li>
+                    <li><i class="fas fa-map-marker-alt mr-2"></i> ${content.footer.address || '123 Business Ave, City'}</li>
+                `;
+                
+                const socialLinks = document.getElementById('socialLinks');
+                socialLinks.innerHTML = `
+                    <a href="${content.footer.facebook || '#'}" class="text-lg md:text-xl lg:text-2xl hover:text-white transition" style="color: var(--footer-text-muted, #9ca3af);"><i class="fab fa-facebook"></i></a>
+                    <a href="${content.footer.instagram || '#'}" class="text-lg md:text-xl lg:text-2xl hover:text-white transition" style="color: var(--footer-text-muted, #9ca3af);"><i class="fab fa-instagram"></i></a>
+                    <a href="${content.footer.twitter || '#'}" class="text-lg md:text-xl lg:text-2xl hover:text-white transition" style="color: var(--footer-text-muted, #9ca3af);"><i class="fab fa-twitter"></i></a>
+                `;
+            }
+            
+            // Copyright
+            if (content.copyright) {
+                document.getElementById('copyright').textContent = content.copyright;
+            }
+            
+            // Logo icon color
+            if (content.logo && content.logo.iconColor) {
+                document.getElementById('logoIcon').style.color = content.logo.iconColor;
+            }
+        }
 
-            container.innerHTML = vehicles.map(vehicle => `
-                <div class="vehicle-card bg-white rounded-xl shadow-lg overflow-hidden vehicle-item" data-type="${vehicle.type}">
-                    <img src="${vehicle.image_url || 'https://via.placeholder.com/400x250?text=' + vehicle.name}" 
-                         alt="${vehicle.name}" 
-                         class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-xl font-bold">${vehicle.name}</h3>
-                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold capitalize">${vehicle.type}</span>
-                        </div>
-                        <div class="flex items-center text-gray-600 mb-4">
-                            <i class="fas fa-users mr-2"></i>
-                            <span class="mr-4">${vehicle.seats} seats</span>
-                            <i class="fas fa-cog mr-2"></i>
-                            <span class="capitalize">${vehicle.transmission}</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <span class="text-2xl font-bold text-blue-800">$${vehicle.price_per_day}</span>
-                                <span class="text-gray-600">/day</span>
-                            </div>
-                            <a href="/pages/booking.html?vehicle=${vehicle.id}" 
-                               class="bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition">
-                                Rent Now
-                            </a>
-                        </div>
+        // ========== DISPLAY TESTIMONIALS ==========
+        function displayTestimonials(testimonials) {
+            const container = document.getElementById('customerTestimonials');
+            container.innerHTML = testimonials.map(t => `
+                <div class="bg-white rounded-xl shadow-lg p-4 md:p-5 lg:p-6 text-center">
+                    <img src="${t.image}" alt="${t.name}" class="customer-img w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 mx-auto mb-2 md:mb-3 lg:mb-4">
+                    <h3 class="text-sm md:text-base lg:text-lg font-bold mb-1">${t.name}</h3>
+                    <p class="text-xs md:text-sm text-gray-500 mb-1 md:mb-2">${t.role}</p>
+                    <div class="text-yellow-400 mb-2 md:mb-3">
+                        ${Array(t.rating).fill('<i class="fas fa-star text-xs md:text-sm"></i>').join('')}
                     </div>
+                    <p class="text-xs md:text-sm text-gray-600">"${t.text}"</p>
                 </div>
             `).join('');
         }
 
-        // Filter vehicles
-        window.filterVehicles = function(type) {
-            // Update active button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-800', 'text-white');
-                btn.classList.add('bg-white', 'text-gray-700');
-            });
-            event.target.classList.remove('bg-white', 'text-gray-700');
-            event.target.classList.add('bg-blue-800', 'text-white');
-            
-            // Filter vehicles
-            const items = document.querySelectorAll('.vehicle-item');
-            items.forEach(item => {
-                if (type === 'all' || item.dataset.type === type) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        };
+        // ========== LOAD FEATURED VEHICLES ==========
+        async function loadFeaturedVehicles() {
+            try {
+                const response = await fetch('/api/vehicles');
+                const allVehicles = await response.json();
+                
+                const featured = allVehicles.slice(0, 3);
+                
+                const container = document.getElementById('featuredVehicles');
+                container.innerHTML = featured.map(vehicle => `
+                    <div class="vehicle-card bg-white rounded-xl shadow-lg overflow-hidden">
+                        <img src="${vehicle.images && vehicle.images[0] ? vehicle.images[0] : 'https://via.placeholder.com/400x250?text=' + vehicle.name}" 
+                             alt="${vehicle.name}" 
+                             class="w-full h-32 sm:h-36 md:h-40 lg:h-48 object-cover">
+                        <div class="p-3 md:p-4 lg:p-5">
+                            <div class="flex justify-between items-start mb-1 md:mb-2">
+                                <h3 class="text-sm md:text-base lg:text-lg font-bold">${vehicle.name}</h3>
+                                <span class="px-2 py-0.5 md:px-3 md:py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold capitalize">${vehicle.type}</span>
+                            </div>
+                            <div class="flex items-center text-xs md:text-sm text-gray-600 mb-2 md:mb-3">
+                                <i class="fas fa-users mr-1"></i>
+                                <span class="mr-2">${vehicle.seats} seats</span>
+                                <i class="fas fa-cog mr-1"></i>
+                                <span class="capitalize">${vehicle.transmission}</span>
+                            </div>
+                            <a href="/pages/booking.html?vehicle=${vehicle.id}" 
+                               class="block w-full text-xs md:text-sm text-center px-2 md:px-3 py-1.5 md:py-2 rounded-lg transition"
+                               style="background-color: var(--btn-bg, #1e3a8a); color: var(--btn-text, #ffffff);">
+                                Book Now
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading vehicles:', error);
+            }
+        }
 
-        // Quick search
+        // ========== QUICK SEARCH ==========
         window.quickSearch = function() {
-            const pickup = document.getElementById('quickPickup').value;
-            const ret = document.getElementById('quickReturn').value;
+            const pickup = document.getElementById('heroPickup').value;
+            const ret = document.getElementById('heroReturn').value;
             
             if (!pickup || !ret) {
                 alert('Please select pickup and return dates');
@@ -523,19 +703,42 @@
             window.location.href = `/pages/booking.html?pickup=${pickup}&return=${ret}`;
         };
 
-        // Set default dates
+        // ========== SET DEFAULT DATES ==========
         function setDefaultDates() {
             const today = new Date().toISOString().split('T')[0];
             const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
             
-            document.getElementById('quickPickup').value = today;
-            document.getElementById('quickReturn').value = tomorrow;
+            document.getElementById('heroPickup').value = today;
+            document.getElementById('heroReturn').value = tomorrow;
         }
 
-        // Initialize
+        // ========== CONTACT FORM ==========
+        document.getElementById('contactForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            alert('Message sent! We\'ll get back to you soon.');
+            this.reset();
+        });
+
+        // ========== CHECK IF ADMIN IS LOGGED IN (FOR EDIT BUTTON) ==========
+        function checkAdminAccess() {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            if (user.role === 'admin') {
+                const editBtn = document.createElement('a');
+                editBtn.href = '/pages/dashboard/admin.html#bookings';
+                editBtn.className = 'fixed bottom-4 right-4 text-xs sm:text-sm md:text-base px-3 md:px-4 py-2 md:py-3 rounded-full shadow-lg transition z-50 flex items-center';
+                editBtn.style.backgroundColor = '#1e3a8a';
+                editBtn.style.color = 'white';
+                editBtn.innerHTML = '<i class="fas fa-edit mr-1 md:mr-2"></i>Edit';
+                document.body.appendChild(editBtn);
+            }
+        }
+
+        // ========== INITIALIZE ==========
         document.addEventListener('DOMContentLoaded', () => {
-            loadVehicles();
+            loadContent();
+            loadFeaturedVehicles();
             setDefaultDates();
+            checkAdminAccess();
         });
     </script>
 </body>

@@ -6,300 +6,414 @@
     <title>Staff Dashboard - ABI Car Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        
+        /* Smooth Sidebar Animations */
+        .sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+        
+        .sidebar-link {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.25rem;
+            color: #e2e8f0;
+        }
+        
+        .sidebar-link i { width: 1.5rem; font-size: 1rem; }
+        .sidebar-link:hover { background-color: #047857; color: white; }
+        .sidebar-link.active { background-color: #059669; color: white; }
+        .sidebar-link.active::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background-color: #ffffff; }
+        
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -280px; transition: left 0.3s ease; z-index: 1000; width: 280px; height: 100vh; background: #065f46; }
+            .sidebar.open { left: 0; }
+            .main-content { margin-left: 0 !important; width: 100%; }
+            .mobile-menu-btn { display: flex !important; }
+            .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+            .overlay.active { display: block; }
+            .stat-card { padding: 0.75rem !important; }
+            .camera-preview { height: 200px !important; }
+        }
+        
+        .mobile-menu-btn { display: none; position: fixed; top: 0.75rem; left: 0.75rem; z-index: 1001; background: #059669; color: white; border: none; border-radius: 0.5rem; padding: 0.6rem; cursor: pointer; box-shadow: 0 4px 12px rgba(5,150,105,0.3); align-items: center; justify-content: center; }
+        
+        .camera-preview { width: 100%; height: 250px; background-color: #1f2937; border-radius: 0.5rem; overflow: hidden; }
+        .camera-preview video { width: 100%; height: 100%; object-fit: cover; }
+        .camera-preview img { width: 100%; height: 100%; object-fit: contain; }
+        
+        .image-upload-area { border: 2px dashed #d1d5db; border-radius: 0.5rem; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+        .image-upload-area:hover { border-color: #059669; background-color: #f0fdf4; }
+        
+        .status-badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: capitalize; }
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-approved { background-color: #d1fae5; color: #065f46; }
+        .status-active { background-color: #dbeafe; color: #1e40af; }
+        .status-completed { background-color: #e0e7ff; color: #3730a3; }
+        
+        .filter-section { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .filter-btn { padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; cursor: pointer; background: white; border: 1px solid #e2e8f0; }
+        .filter-btn.active { background-color: #059669; color: white; border-color: #059669; }
+        
+        .stat-card { transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        
+        .task-card { transition: all 0.2s ease; }
+        .task-card:hover { transform: translateX(5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        
+        .form-label { display: block; font-size: 0.75rem; font-weight: 600; color: #4b5563; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.3px; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 2000; align-items: center; justify-content: center; padding: 16px; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 1rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.5rem; animation: scaleIn 0.3s ease; }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        .hidden { display: none; }
+        .cursor-pointer { cursor: pointer; }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center h-16">
-                <h1 class="text-xl font-bold text-blue-600">ABI Staff Dashboard</h1>
-                <div class="flex items-center space-x-4">
-                    <span class="text-gray-600">Welcome, Staff</span>
-                    <a href="/" class="text-gray-600 hover:text-blue-600">
-                        <i class="fas fa-home"></i>
-                    </a>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleMobileSidebar()"><i class="fas fa-bars"></i></button>
+    <div class="overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+    
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 bg-gradient-to-b from-green-700 to-green-800 text-white flex flex-col fixed md:static h-full overflow-y-auto shadow-xl" id="sidebar">
+            <div class="p-4 border-b border-green-600 flex justify-center"><i class="fas fa-users-cog text-3xl text-green-200"></i></div>
+            <div class="p-3 border-b border-green-600 bg-green-800 bg-opacity-50">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center"><i class="fas fa-user-tie text-sm"></i></div>
+                    <div class="flex-1 min-w-0"><p class="font-semibold text-sm truncate" id="staffName">Staff</p><p class="text-xs text-green-300 truncate">Staff Member</p></div>
                 </div>
             </div>
+            <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+                <a href="#" onclick="showSection('tasks'); return false;" class="sidebar-link active" id="nav-tasks"><i class="fas fa-tasks w-6"></i><span>My Tasks</span><span id="taskBadge" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full hidden">0</span></a>
+                <a href="#" onclick="showSection('active'); return false;" class="sidebar-link" id="nav-active"><i class="fas fa-car w-6"></i><span>Active Rentals</span><span id="activeBadge" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full hidden">0</span></a>
+                <a href="#" onclick="showSection('walkin'); return false;" class="sidebar-link" id="nav-walkin"><i class="fas fa-walking w-6"></i><span>Walk-in Form</span></a>
+                <a href="#" onclick="showSection('history'); return false;" class="sidebar-link" id="nav-history"><i class="fas fa-history w-6"></i><span>Completed</span></a>
+                <div class="pt-4 mt-2 border-t border-green-600"><a href="#" onclick="logout(); return false;" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-red-600 text-sm"><i class="fas fa-sign-out-alt w-6"></i><span>Logout</span></a></div>
+            </nav>
         </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-bold">Today's Operations</h2>
-            <div class="flex space-x-2">
-                <button onclick="filterBookings('all')" class="px-4 py-2 bg-blue-600 text-white rounded-lg">All</button>
-                <button onclick="filterBookings('today')" class="px-4 py-2 bg-gray-200 rounded-lg">Today</button>
-                <button onclick="filterBookings('upcoming')" class="px-4 py-2 bg-gray-200 rounded-lg">Upcoming</button>
-            </div>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="bg-blue-100 rounded-full p-3 mr-4">
-                        <i class="fas fa-calendar-check text-blue-600 text-xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-gray-600">Today's Pickups</p>
-                        <p id="todayPickups" class="text-2xl font-bold">0</p>
-                    </div>
-                </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 main-content overflow-auto" id="mainContent">
+            <div class="bg-white shadow-sm p-3 flex justify-between items-center sticky top-0 z-10 border-b border-gray-200">
+                <h2 class="text-base md:text-lg font-bold text-gray-800" id="pageTitle">My Tasks</h2>
+                <div class="flex items-center space-x-2"><button onclick="refreshData()" class="p-1.5 hover:bg-gray-100 rounded-lg"><i class="fas fa-sync-alt text-gray-600 text-sm"></i></button><div class="text-right hidden md:block"><p class="text-xs font-semibold text-gray-700" id="currentDateTime"></p></div></div>
             </div>
             
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="bg-green-100 rounded-full p-3 mr-4">
-                        <i class="fas fa-car text-green-600 text-xl"></i>
+            <div class="p-3 md:p-4">
+                <!-- Tasks Section -->
+                <div id="section-tasks" class="section-content">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+                        <div class="stat-card bg-gradient-to-br from-green-600 to-green-800 text-white rounded-lg shadow p-3"><div class="flex justify-between"><div><p class="text-xs text-green-100">Today's Tasks</p><p class="text-lg font-bold" id="todayTasks">0</p></div><i class="fas fa-tasks text-xl text-green-300"></i></div></div>
+                        <div class="stat-card bg-gradient-to-br from-yellow-600 to-yellow-800 text-white rounded-lg shadow p-3"><div class="flex justify-between"><div><p class="text-xs text-yellow-100">Pickups Today</p><p class="text-lg font-bold" id="pickupsToday">0</p></div><i class="fas fa-arrow-up text-xl text-yellow-300"></i></div></div>
+                        <div class="stat-card bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-lg shadow p-3"><div class="flex justify-between"><div><p class="text-xs text-blue-100">Returns Today</p><p class="text-lg font-bold" id="returnsToday">0</p></div><i class="fas fa-arrow-down text-xl text-blue-300"></i></div></div>
+                        <div class="stat-card bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-lg shadow p-3"><div class="flex justify-between"><div><p class="text-xs text-purple-100">Active Rentals</p><p class="text-lg font-bold" id="activeCount">0</p></div><i class="fas fa-car text-xl text-purple-300"></i></div></div>
                     </div>
-                    <div>
-                        <p class="text-gray-600">Active Rentals</p>
-                        <p id="activeRentals" class="text-2xl font-bold">0</p>
+                    <div class="bg-white rounded-lg shadow p-4"><h3 class="text-sm font-semibold mb-3">My Assigned Tasks</h3><div id="tasksList" class="space-y-3"></div></div>
+                </div>
+                
+                <!-- Active Rentals Section -->
+                <div id="section-active" class="section-content hidden">
+                    <div class="bg-white rounded-lg shadow p-4"><h3 class="text-base font-bold mb-4">Active Rentals</h3>
+                        <div class="filter-section"><button onclick="filterActive('all')" class="filter-btn active">All</button><button onclick="filterActive('pickup')" class="filter-btn">For Pickup</button><button onclick="filterActive('ongoing')" class="filter-btn">Ongoing</button><button onclick="filterActive('return')" class="filter-btn">For Return</button></div>
+                        <div id="activeList" class="space-y-3"></div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="bg-yellow-100 rounded-full p-3 mr-4">
-                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-gray-600">Pending Returns</p>
-                        <p id="pendingReturns" class="text-2xl font-bold">0</p>
+                
+                <!-- Walk-in Form Section -->
+                <div id="section-walkin" class="section-content hidden">
+                    <div class="bg-white rounded-lg shadow p-4"><h3 class="text-base font-bold mb-4">Walk-in Rental Form</h3>
+                        <form id="walkinForm" onsubmit="submitWalkin(event)" class="space-y-4">
+                            <div><label class="form-label">Full Name *</label><input type="text" id="walkinName" required class="w-full px-3 py-2 text-sm border rounded-lg"></div>
+                            <div><label class="form-label">Phone Number *</label><input type="tel" id="walkinPhone" required class="w-full px-3 py-2 text-sm border rounded-lg"></div>
+                            <div><label class="form-label">Address *</label><input type="text" id="walkinAddress" required class="w-full px-3 py-2 text-sm border rounded-lg"></div>
+                            <div><label class="form-label">Facebook Name</label><input type="text" id="walkinFacebook" class="w-full px-3 py-2 text-sm border rounded-lg"></div>
+                            <div><label class="form-label">Emergency Contact *</label><input type="text" id="walkinEmergency" required class="w-full px-3 py-2 text-sm border rounded-lg"></div>
+                            <div><label class="form-label">Select Vehicle *</label><select id="walkinVehicle" required class="w-full px-3 py-2 text-sm border rounded-lg"><option value="">Choose vehicle...</option></select></div>
+                            <div class="grid grid-cols-2 gap-3"><div><label class="form-label">Pickup Date *</label><input type="date" id="walkinPickupDate" required class="w-full px-3 py-2 text-sm border rounded-lg"></div><div><label class="form-label">Return Date *</label><input type="date" id="walkinReturnDate" required class="w-full px-3 py-2 text-sm border rounded-lg"></div></div>
+                            <div><label class="form-label">Pickup Time *</label><input type="time" id="walkinTime" required class="w-full px-3 py-2 text-sm border rounded-lg"></div>
+                            <div><label class="form-label mb-3">Driver's License *</label>
+                                <div class="flex gap-2 mb-3"><button type="button" onclick="useCamera()" class="flex-1 bg-blue-600 text-white py-2 rounded text-sm"><i class="fas fa-camera mr-1"></i>Use Camera</button><button type="button" onclick="useFileUpload()" class="flex-1 bg-gray-600 text-white py-2 rounded text-sm"><i class="fas fa-upload mr-1"></i>Upload File</button></div>
+                                <div id="cameraContainer" class="hidden mb-3"><div class="camera-preview"><video id="video" autoplay playsinline></video></div><div class="flex gap-2 mt-2"><button type="button" onclick="capturePhoto()" class="flex-1 bg-green-600 text-white py-2 rounded text-sm">Capture</button><button type="button" onclick="stopCamera()" class="flex-1 bg-red-600 text-white py-2 rounded text-sm">Stop</button></div></div>
+                                <div id="fileUploadContainer" class="hidden mb-3"><div class="image-upload-area" onclick="document.getElementById('licenseFile').click()"><i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i><p class="text-sm text-gray-600">Click to upload license image</p><input type="file" id="licenseFile" accept="image/*" class="hidden" onchange="handleFileSelect(event)"></div></div>
+                                <div id="licensePreview" class="hidden"><img id="licenseImage" src="" alt="License" class="max-h-48 mx-auto rounded border"></div>
+                            </div>
+                            <div class="flex gap-3 pt-4"><button type="submit" class="flex-1 bg-green-600 text-white py-3 rounded-lg text-sm font-semibold">Submit Walk-in Request</button><button type="button" onclick="clearWalkinForm()" class="flex-1 bg-gray-300 py-3 rounded-lg text-sm">Clear</button></div>
+                        </form>
                     </div>
                 </div>
-            </div>
-            
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="bg-purple-100 rounded-full p-3 mr-4">
-                        <i class="fas fa-dollar-sign text-purple-600 text-xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-gray-600">Today's Revenue</p>
-                        <p id="todayRevenue" class="text-2xl font-bold">$0</p>
+                
+                <!-- Completed Section -->
+                <div id="section-history" class="section-content hidden">
+                    <div class="bg-white rounded-lg shadow p-4"><h3 class="text-base font-bold mb-4">Completed Tasks</h3>
+                        <div class="filter-section"><button onclick="filterHistory('all')" class="filter-btn active">All</button><button onclick="filterHistory('week')" class="filter-btn">This Week</button><button onclick="filterHistory('month')" class="filter-btn">This Month</button></div>
+                        <div id="historyList" class="space-y-3"></div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Bookings Table -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b">
-                <h3 class="text-lg font-semibold">Recent Bookings</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking #</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pickup</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Return</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="bookingsTableBody" class="bg-white divide-y divide-gray-200">
-                        <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                                Loading bookings...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
-
-    <!-- Status Update Modal -->
-    <div id="statusModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-6 w-96">
-            <h3 class="text-lg font-bold mb-4">Update Booking Status</h3>
-            <select id="statusSelect" class="w-full px-3 py-2 border rounded-lg mb-4">
-                <option value="confirmed">Confirmed</option>
-                <option value="active">Active (Picked Up)</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-            </select>
-            <div class="flex justify-end space-x-2">
-                <button onclick="closeStatusModal()" class="px-4 py-2 bg-gray-300 rounded-lg">Cancel</button>
-                <button onclick="updateStatus()" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Update</button>
-            </div>
+    
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-base font-bold" id="modalTitle">Process Task</h3><button onclick="closeTaskModal()" class="text-gray-500 hover:text-gray-700"><i class="fas fa-times text-xl"></i></button></div>
+            <div id="modalContent" class="space-y-4"></div>
+            <div class="flex gap-3 mt-4"><button onclick="submitTask()" class="flex-1 bg-green-600 text-white py-2 rounded text-sm">Submit</button><button onclick="closeTaskModal()" class="flex-1 bg-gray-300 py-2 rounded text-sm">Cancel</button></div>
         </div>
     </div>
 
     <script>
-        let currentBookings = [];
-        let currentFilter = 'all';
-        let selectedBookingId = null;
+        let currentUser = null, token = localStorage.getItem('token'), stream = null, licenseImage = null, vehicles = [], allBookings = [], myTasks = [], activeRentals = [], completedTasks = [], currentTaskId = null, currentTaskType = null, dashboardPhotos = [], returnPhotos = [];
 
-        // Load bookings on page load
-        document.addEventListener('DOMContentLoaded', loadBookings);
+        (function checkAuth() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr || !token) { window.location.href = '/pages/staff-login.html'; return; }
+            try {
+                currentUser = JSON.parse(userStr);
+                if (currentUser.role !== 'staff') { window.location.href = '/'; return; }
+                document.getElementById('staffName').textContent = currentUser.fullname || 'Staff';
+                loadDashboardData();
+            } catch(e) { window.location.href = '/pages/staff-login.html'; }
+        })();
 
-        // Load bookings every 30 seconds (auto-refresh)
-        setInterval(loadBookings, 30000);
+        window.toggleMobileSidebar = function() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); };
+        
+        window.showSection = function(section) {
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`section-${section}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+            document.getElementById(`nav-${section}`).classList.add('active');
+            const titles = { tasks: 'My Tasks', active: 'Active Rentals', walkin: 'Walk-in Form', history: 'Completed' };
+            document.getElementById('pageTitle').textContent = titles[section];
+            if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
+            if (section === 'walkin') loadVehicles();
+        };
 
+        async function loadDashboardData() { await Promise.all([loadVehicles(), loadBookings()]); }
+        
+        async function loadVehicles() {
+            try { const res = await fetch('/api/vehicles'); vehicles = await res.json(); const select = document.getElementById('walkinVehicle'); if(select) select.innerHTML = '<option value="">Choose vehicle...</option>' + vehicles.map(v => `<option value="${v.id}">${v.brand} ${v.model} (${v.plateNumber})</option>`).join(''); }
+            catch(e) { console.error('Error loading vehicles:', e); }
+        }
+        
         async function loadBookings() {
             try {
-                const response = await fetch('/api/bookings');
-                const bookings = await response.json();
-                currentBookings = bookings;
-                displayBookings(bookings);
-                updateStats(bookings);
-            } catch (error) {
-                console.error('Error loading bookings:', error);
-            }
+                const res = await fetch('/api/bookings', { headers: { 'Authorization': `Bearer ${token}` } });
+                allBookings = await res.json();
+                const staffBookings = allBookings.filter(b => b.assignedStaffId == currentUser?.id);
+                myTasks = staffBookings.filter(b => b.status === 'approved');
+                activeRentals = staffBookings.filter(b => b.status === 'active');
+                completedTasks = staffBookings.filter(b => b.status === 'completed');
+                updateStats();
+                displayTasks(myTasks);
+                displayActiveRentals(activeRentals);
+                displayCompleted(completedTasks);
+            } catch(e) { console.error('Error loading bookings:', e); }
         }
-
-        function displayBookings(bookings) {
-            const tbody = document.getElementById('bookingsTableBody');
-            
-            if (bookings.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                            No bookings found
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            tbody.innerHTML = bookings.map(booking => {
-                const pickupDate = new Date(booking.pickupDate).toLocaleDateString();
-                const returnDate = new Date(booking.returnDate).toLocaleDateString();
-                
-                let statusColor = {
-                    'confirmed': 'bg-yellow-100 text-yellow-800',
-                    'active': 'bg-green-100 text-green-800',
-                    'completed': 'bg-gray-100 text-gray-800',
-                    'cancelled': 'bg-red-100 text-red-800'
-                }[booking.status] || 'bg-gray-100 text-gray-800';
-
-                return `
-                    <tr>
-                        <td class="px-6 py-4">
-                            <span class="text-sm font-mono">${booking.bookingNumber}</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="text-sm font-medium">${booking.customerName}</div>
-                            <div class="text-xs text-gray-500">${booking.customerPhone}</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm">${booking.vehicleName || 'Vehicle'}</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm">${pickupDate}</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm">${returnDate}</span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 text-xs rounded-full ${statusColor}">
-                                ${booking.status}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-sm">
-                            <button onclick="openStatusModal(${booking.id})" 
-                                    class="text-blue-600 hover:text-blue-900 mr-3">
-                                <i class="fas fa-edit"></i> Status
-                            </button>
-                            <button onclick="viewDetails('${booking.bookingNumber}')" 
-                                    class="text-gray-600 hover:text-gray-900">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
+        
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('todayTasks').textContent = myTasks.length;
+            document.getElementById('pickupsToday').textContent = myTasks.filter(t => t.startDate === today).length;
+            document.getElementById('returnsToday').textContent = activeRentals.filter(r => r.endDate === today).length;
+            document.getElementById('activeCount').textContent = activeRentals.length;
+            document.getElementById('taskBadge').textContent = myTasks.length; document.getElementById('taskBadge').classList.toggle('hidden', myTasks.length === 0);
+            document.getElementById('activeBadge').textContent = activeRentals.length; document.getElementById('activeBadge').classList.toggle('hidden', activeRentals.length === 0);
+        }
+        
+        function displayTasks(tasks) {
+            const container = document.getElementById('tasksList');
+            if (!tasks.length) { container.innerHTML = '<p class="text-center py-4 text-gray-500">No pending tasks</p>'; return; }
+            container.innerHTML = tasks.map(task => {
+                const today = new Date().toISOString().split('T')[0];
+                const hasStartData = task.odoStart ? true : false;
+                return `<div class="task-card bg-gray-50 rounded-lg p-3 border cursor-pointer hover:shadow" onclick="openTaskModal(${task.id})">
+                    <div class="flex justify-between items-start mb-2"><div><span class="text-xs font-semibold text-gray-600">${task.bookingNumber}</span><h4 class="font-semibold text-sm">${task.fullName}</h4></div>
+                    <span class="px-2 py-1 ${hasStartData ? 'bg-green-100 text-green-800' : (task.startDate === today ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-600')} rounded-full text-xs">${hasStartData ? '✅ Processed' : (task.startDate === today ? '🚗 Pickup Today' : '📅 Scheduled')}</span></div>
+                    <p class="text-xs text-gray-600">${task.vehicleName} • ₱${task.price}</p><p class="text-xs text-gray-500 mt-1">Pickup: ${task.startDate} at ${task.pickupTime}</p>
+                    ${task.odoStart ? `<p class="text-xs text-green-600 mt-1">ODO Start: ${task.odoStart} km</p>` : ''}
+                </div>`;
             }).join('');
         }
-
-        function updateStats(bookings) {
-            const today = new Date().toISOString().split('T')[0];
+        
+        window.openTaskModal = function(bookingId) {
+            currentTaskId = bookingId;
+            const booking = allBookings.find(b => b.id === bookingId);
+            if (!booking) return;
+            const hasStartData = booking.odoStart ? true : false;
+            const modal = document.getElementById('taskModal');
+            const content = document.getElementById('modalContent');
             
-            // Today's pickups
-            const todayPickups = bookings.filter(b => 
-                b.pickupDate === today && b.status !== 'cancelled'
-            ).length;
-            
-            // Active rentals
-            const activeRentals = bookings.filter(b => 
-                b.status === 'active'
-            ).length;
-            
-            // Pending returns (due today)
-            const pendingReturns = bookings.filter(b => 
-                b.returnDate === today && b.status === 'active'
-            ).length;
-            
-            // Today's revenue (completed today or active)
-            const todayRevenue = bookings
-                .filter(b => b.pickupDate === today && b.status !== 'cancelled')
-                .reduce((sum, b) => sum + (b.totalAmount || 0), 0);
-
-            document.getElementById('todayPickups').textContent = todayPickups;
-            document.getElementById('activeRentals').textContent = activeRentals;
-            document.getElementById('pendingReturns').textContent = pendingReturns;
-            document.getElementById('todayRevenue').textContent = `$${todayRevenue}`;
-        }
-
-        function filterBookings(filter) {
-            currentFilter = filter;
-            const buttons = document.querySelectorAll('button[onclick^="filterBookings"]');
-            buttons.forEach(b => b.classList.remove('bg-blue-600', 'text-white'));
-            buttons.forEach(b => b.classList.add('bg-gray-200'));
-            
-            event.target.classList.remove('bg-gray-200');
-            event.target.classList.add('bg-blue-600', 'text-white');
-            
-            let filtered = currentBookings;
-            const today = new Date().toISOString().split('T')[0];
-            
-            if (filter === 'today') {
-                filtered = currentBookings.filter(b => b.pickupDate === today);
-            } else if (filter === 'upcoming') {
-                filtered = currentBookings.filter(b => b.pickupDate > today);
+            if (!hasStartData) {
+                content.innerHTML = `
+                    <div class="bg-blue-50 p-3 rounded mb-3"><p class="text-sm font-semibold">Customer: ${booking.fullName}</p><p class="text-sm">Vehicle: ${booking.vehicleName} (${booking.vehiclePlate})</p><p class="text-sm">Pickup: ${booking.startDate} at ${booking.pickupTime}</p><p class="text-sm font-semibold mt-2">Price: ₱${booking.price} | Carwash: ₱${booking.carwashFee || 0}</p></div>
+                    <h4 class="font-semibold text-sm mb-3">📸 Pickup - Dashboard Photo Required</h4>
+                    <div class="mb-3"><label class="form-label">Odometer Reading (Start) *</label><input type="number" id="odoStart" class="w-full px-3 py-2 text-sm border rounded-lg" required placeholder="e.g. 12345 km"></div>
+                    <div class="mb-3"><label class="form-label">Fuel Gauge Reading (Start) *</label><input type="text" id="fuelStart" class="w-full px-3 py-2 text-sm border rounded-lg" required placeholder="e.g. Full, 3/4, 1/2, 1/4, Empty"><p class="text-xs text-gray-500 mt-1">Enter the fuel level as shown on the vehicle's gauge</p></div>
+                    <div class="mb-3"><label class="form-label">Dashboard Photo (showing ODO and Fuel) *</label>
+                        <div class="flex gap-2 mb-2"><button type="button" onclick="useDashboardCamera()" class="flex-1 bg-blue-600 text-white py-2 rounded text-sm"><i class="fas fa-camera mr-1"></i>Take Photo</button><button type="button" onclick="useDashboardUpload()" class="flex-1 bg-gray-600 text-white py-2 rounded text-sm"><i class="fas fa-upload mr-1"></i>Upload Photo</button></div>
+                        <div id="dashboardCameraContainer" class="hidden mb-2"><div class="camera-preview"><video id="dashboardVideo" autoplay playsinline></video></div><div class="flex gap-2 mt-2"><button type="button" onclick="captureDashboardPhoto()" class="flex-1 bg-green-600 text-white py-2 rounded text-sm">Capture</button><button type="button" onclick="stopDashboardCamera()" class="flex-1 bg-red-600 text-white py-2 rounded text-sm">Stop</button></div></div>
+                        <div id="dashboardUploadContainer" class="hidden mb-2"><div class="image-upload-area" onclick="document.getElementById('dashboardFile').click()"><i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i><p class="text-xs text-gray-600">Click to upload dashboard photo</p><input type="file" id="dashboardFile" accept="image/*" class="hidden" onchange="handleDashboardFile(event)"></div></div>
+                        <div id="dashboardPreview" class="hidden"><img id="dashboardImage" src="" alt="Dashboard Photo" class="max-h-32 mx-auto rounded border"></div>
+                    </div>
+                    <div class="mb-3"><label class="form-label">Pickup Notes</label><textarea id="pickupNotes" rows="2" class="w-full px-3 py-2 text-sm border rounded-lg" placeholder="Any remarks about vehicle condition"></textarea></div>
+                `;
+                document.getElementById('modalTitle').textContent = 'Process Pickup - Record Start Data';
+            } else {
+                const startDate = new Date(booking.startDate + 'T' + booking.pickupTime);
+                const endDate = new Date(booking.endDate + 'T' + booking.pickupTime);
+                const now = new Date();
+                const isLate = now > endDate;
+                const lateHours = isLate ? Math.ceil((now - endDate) / (1000 * 60 * 60)) : 0;
+                content.innerHTML = `
+                    <div class="bg-green-50 p-3 rounded mb-3"><p class="text-sm font-semibold">Customer: ${booking.fullName}</p><p class="text-sm">Vehicle: ${booking.vehicleName} (${booking.vehiclePlate})</p><p class="text-sm">Start ODO: ${booking.odoStart} km | Start Fuel: ${booking.fuelStart}</p><p class="text-sm">Pickup: ${booking.startDate} at ${booking.pickupTime}</p><p class="text-sm">Expected Return: ${booking.endDate} at ${booking.pickupTime}</p>${isLate ? `<p class="text-sm text-red-600 font-medium mt-2">⚠️ LATE RETURN - ${lateHours} hours late</p>` : ''}</div>
+                    <h4 class="font-semibold text-sm mb-3">📸 Return - Dashboard Photo Required</h4>
+                    <div class="mb-3"><label class="form-label">Odometer Reading (Return) *</label><input type="number" id="odoReturn" class="w-full px-3 py-2 text-sm border rounded-lg" required placeholder="e.g. 13000 km" onchange="calculateCharges(${booking.odoStart}, '${booking.startDate}', '${booking.endDate}')"></div>
+                    <div class="mb-3"><label class="form-label">Fuel Gauge Reading (Return) *</label><input type="text" id="fuelReturn" class="w-full px-3 py-2 text-sm border rounded-lg" required placeholder="e.g. Full, 3/4, 1/2, 1/4, Empty"></div>
+                    <div class="mb-3"><label class="form-label">Dashboard Photo (showing ODO and Fuel) *</label>
+                        <div class="flex gap-2 mb-2"><button type="button" onclick="useReturnCamera()" class="flex-1 bg-blue-600 text-white py-2 rounded text-sm"><i class="fas fa-camera mr-1"></i>Take Photo</button><button type="button" onclick="useReturnUpload()" class="flex-1 bg-gray-600 text-white py-2 rounded text-sm"><i class="fas fa-upload mr-1"></i>Upload Photo</button></div>
+                        <div id="returnCameraContainer" class="hidden mb-2"><div class="camera-preview"><video id="returnVideo" autoplay playsinline></video></div><div class="flex gap-2 mt-2"><button type="button" onclick="captureReturnPhoto()" class="flex-1 bg-green-600 text-white py-2 rounded text-sm">Capture</button><button type="button" onclick="stopReturnCamera()" class="flex-1 bg-red-600 text-white py-2 rounded text-sm">Stop</button></div></div>
+                        <div id="returnUploadContainer" class="hidden mb-2"><div class="image-upload-area" onclick="document.getElementById('returnFile').click()"><i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i><p class="text-xs text-gray-600">Click to upload dashboard photo</p><input type="file" id="returnFile" accept="image/*" class="hidden" onchange="handleReturnFile(event)"></div></div>
+                        <div id="returnPreview" class="hidden"><img id="returnImage" src="" alt="Return Dashboard Photo" class="max-h-32 mx-auto rounded border"></div>
+                    </div>
+                    <div class="mb-3 p-3 bg-gray-100 rounded"><h5 class="font-medium text-sm mb-2">Distance & Charge Calculation</h5><div class="grid grid-cols-2 gap-2 text-sm"><div><p class="text-gray-600">Distance Traveled:</p><p class="font-semibold" id="distanceTraveled">0 km</p></div><div><p class="text-gray-600">Rental Days:</p><p class="font-semibold" id="rentalDays">-</p></div><div><p class="text-gray-600">Allowed KM (200km/day):</p><p class="font-semibold" id="allowedKM">-</p></div><div><p class="text-gray-600">Excess KM:</p><p class="font-semibold" id="excessKM">0 km</p></div><div><p class="text-gray-600">Excess Charge (₱15/km):</p><p class="font-semibold text-orange-600" id="excessKMCharge">₱0</p></div><div><p class="text-gray-600">Late Hours:</p><p class="font-semibold" id="lateHoursDisplay">${lateHours} hrs</p></div><div><p class="text-gray-600">Late Fee:</p><p class="font-semibold text-red-600" id="lateFeeDisplay">₱0</p></div></div><input type="hidden" id="excessKMValue" value="0"><input type="hidden" id="lateFeeValue" value="0"></div>
+                    <div class="mb-3"><label class="form-label">Return Notes</label><textarea id="returnNotes" rows="2" class="w-full px-3 py-2 text-sm border rounded-lg" placeholder="Any remarks about damage, cleanliness, or issues"></textarea></div>
+                `;
+                document.getElementById('modalTitle').textContent = 'Process Return - Calculate Charges';
             }
-            
-            displayBookings(filtered);
+            modal.classList.remove('hidden'); modal.classList.add('active');
+        };
+        
+        window.calculateCharges = function(odoStart, startDate, endDate) {
+            const odoReturn = parseFloat(document.getElementById('odoReturn')?.value || 0);
+            if (odoStart && odoReturn && odoReturn > odoStart) {
+                const distance = odoReturn - odoStart;
+                document.getElementById('distanceTraveled').textContent = distance + ' km';
+                const start = new Date(startDate), end = new Date(endDate);
+                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                document.getElementById('rentalDays').textContent = days + ' days';
+                const allowedKM = days * 200;
+                document.getElementById('allowedKM').textContent = allowedKM + ' km';
+                if (distance > allowedKM) { const excess = distance - allowedKM; const charge = excess * 15; document.getElementById('excessKM').textContent = excess + ' km'; document.getElementById('excessKMCharge').textContent = `₱${charge}`; document.getElementById('excessKMValue').value = charge; }
+                else { document.getElementById('excessKM').textContent = '0 km'; document.getElementById('excessKMCharge').textContent = '₱0'; document.getElementById('excessKMValue').value = 0; }
+            }
+        };
+        
+        let dashboardStream = null, returnStream = null;
+        window.useDashboardCamera = async function() { document.getElementById('dashboardCameraContainer').classList.remove('hidden'); document.getElementById('dashboardUploadContainer').classList.add('hidden'); try { dashboardStream = await navigator.mediaDevices.getUserMedia({ video: true }); document.getElementById('dashboardVideo').srcObject = dashboardStream; } catch(e) { alert('Unable to access camera'); useDashboardUpload(); } };
+        window.useDashboardUpload = function() { if(dashboardStream) dashboardStream.getTracks().forEach(t => t.stop()); document.getElementById('dashboardCameraContainer').classList.add('hidden'); document.getElementById('dashboardUploadContainer').classList.remove('hidden'); };
+        window.captureDashboardPhoto = function() { const video = document.getElementById('dashboardVideo'); const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0); const imageData = canvas.toDataURL('image/jpeg'); document.getElementById('dashboardImage').src = imageData; document.getElementById('dashboardPreview').classList.remove('hidden'); if(dashboardStream) dashboardStream.getTracks().forEach(t => t.stop()); window.dashboardPhoto = imageData; };
+        window.handleDashboardFile = function(event) { const file = event.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = function(e) { window.dashboardPhoto = e.target.result; document.getElementById('dashboardImage').src = window.dashboardPhoto; document.getElementById('dashboardPreview').classList.remove('hidden'); }; reader.readAsDataURL(file); } };
+        window.useReturnCamera = async function() { document.getElementById('returnCameraContainer').classList.remove('hidden'); document.getElementById('returnUploadContainer').classList.add('hidden'); try { returnStream = await navigator.mediaDevices.getUserMedia({ video: true }); document.getElementById('returnVideo').srcObject = returnStream; } catch(e) { alert('Unable to access camera'); useReturnUpload(); } };
+        window.useReturnUpload = function() { if(returnStream) returnStream.getTracks().forEach(t => t.stop()); document.getElementById('returnCameraContainer').classList.add('hidden'); document.getElementById('returnUploadContainer').classList.remove('hidden'); };
+        window.captureReturnPhoto = function() { const video = document.getElementById('returnVideo'); const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0); const imageData = canvas.toDataURL('image/jpeg'); document.getElementById('returnImage').src = imageData; document.getElementById('returnPreview').classList.remove('hidden'); if(returnStream) returnStream.getTracks().forEach(t => t.stop()); window.returnPhoto = imageData; };
+        window.handleReturnFile = function(event) { const file = event.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = function(e) { window.returnPhoto = e.target.result; document.getElementById('returnImage').src = window.returnPhoto; document.getElementById('returnPreview').classList.remove('hidden'); }; reader.readAsDataURL(file); } };
+        
+        window.submitTask = async function() {
+            const modalTitle = document.getElementById('modalTitle').textContent;
+            if (modalTitle.includes('Start Data')) {
+                const odoStart = document.getElementById('odoStart')?.value;
+                const fuelStart = document.getElementById('fuelStart')?.value;
+                if (!odoStart) { alert('Please enter starting odometer reading'); return; }
+                if (!fuelStart) { alert('Please enter fuel gauge reading'); return; }
+                if (!window.dashboardPhoto) { alert('Please take/upload a photo of the dashboard showing ODO and fuel'); return; }
+                const pickupData = { status: 'active', odoStart: odoStart, fuelStart: fuelStart, dashboardPhoto: window.dashboardPhoto, pickupNotes: document.getElementById('pickupNotes')?.value || '', pickedUpAt: new Date().toISOString() };
+                try {
+                    const response = await fetch(`/api/bookings/${currentTaskId}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(pickupData) });
+                    if (response.ok) { alert('Start data recorded successfully. Vehicle is now ACTIVE.'); closeTaskModal(); await loadBookings(); }
+                    else { const error = await response.json(); alert('Error: ' + (error.error || 'Failed to record start data')); }
+                } catch(error) { alert('Error recording start data'); }
+            } else if (modalTitle.includes('Return')) {
+                const odoReturn = document.getElementById('odoReturn')?.value;
+                const fuelReturn = document.getElementById('fuelReturn')?.value;
+                const excessKM = document.getElementById('excessKMValue')?.value || 0;
+                if (!odoReturn) { alert('Please enter return odometer reading'); return; }
+                if (!fuelReturn) { alert('Please enter return fuel gauge reading'); return; }
+                if (!window.returnPhoto) { alert('Please take/upload a photo of the return dashboard showing ODO and fuel'); return; }
+                const returnData = { status: 'completed', odoReturn: odoReturn, fuelReturn: fuelReturn, excessKM: excessKM, returnDashboardPhoto: window.returnPhoto, returnNotes: document.getElementById('returnNotes')?.value || '', returnedAt: new Date().toISOString() };
+                try {
+                    const response = await fetch(`/api/bookings/${currentTaskId}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(returnData) });
+                    if (response.ok) { alert('Return processed successfully. Booking COMPLETED.'); closeTaskModal(); await loadBookings(); }
+                    else { const error = await response.json(); alert('Error: ' + (error.error || 'Failed to process return')); }
+                } catch(error) { alert('Error processing return'); }
+            } else { closeTaskModal(); }
+        };
+        
+        window.closeTaskModal = function() { document.getElementById('taskModal').classList.add('hidden'); document.getElementById('taskModal').classList.remove('active'); window.dashboardPhoto = null; window.returnPhoto = null; };
+        
+        function displayActiveRentals(rentals) {
+            const container = document.getElementById('activeList');
+            if (!rentals.length) { container.innerHTML = '<p class="text-center py-4 text-gray-500">No active rentals</p>'; return; }
+            container.innerHTML = rentals.map(r => `<div class="bg-gray-50 rounded-lg p-3 border cursor-pointer hover:shadow" onclick="openTaskModal(${r.id})"><div class="flex justify-between items-start mb-2"><div><span class="text-xs font-semibold text-gray-600">${r.bookingNumber}</span><h4 class="font-semibold text-sm">${r.fullName}</h4></div><span class="status-badge status-active">Active</span></div><p class="text-xs text-gray-600 mb-1">${r.vehicleName} • ODO: ${r.odoStart} km</p><div class="flex justify-between text-xs text-gray-500"><span>Pickup: ${r.startDate}</span><span>Return: ${r.endDate}</span></div><p class="text-xs text-orange-600 mt-1">Due: ${r.endDate} at ${r.pickupTime}</p></div>`).join('');
         }
-
-        function openStatusModal(bookingId) {
-            selectedBookingId = bookingId;
-            document.getElementById('statusModal').classList.remove('hidden');
+        
+        window.filterActive = function(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active');
+            const today = new Date().toISOString().split('T')[0];
+            let filtered = activeRentals;
+            if (filter === 'pickup') filtered = activeRentals.filter(r => r.startDate === today);
+            else if (filter === 'ongoing') filtered = activeRentals.filter(r => r.startDate < today && r.endDate > today);
+            else if (filter === 'return') filtered = activeRentals.filter(r => r.endDate === today);
+            displayActiveRentals(filtered);
+        };
+        
+        function displayCompleted(completed) {
+            const container = document.getElementById('historyList');
+            if (!completed.length) { container.innerHTML = '<p class="text-center py-4 text-gray-500">No completed tasks</p>'; return; }
+            container.innerHTML = completed.map(c => `<div class="bg-gray-50 rounded-lg p-3 border"><div class="flex justify-between items-start mb-2"><div><span class="text-xs font-semibold text-gray-600">${c.bookingNumber}</span><h4 class="font-semibold text-sm">${c.fullName}</h4></div><span class="status-badge status-completed">Completed</span></div><p class="text-xs text-gray-600">${c.vehicleName}</p><div class="flex justify-between text-xs text-gray-500 mt-1"><span>Returned: ${c.returnedAt ? new Date(c.returnedAt).toLocaleDateString() : c.endDate}</span><span class="font-medium">₱${c.price || 0}</span></div>${c.excessKM ? `<p class="text-xs text-orange-600 mt-1">Excess KM: ₱${c.excessKM}</p>` : ''}</div>`).join('');
         }
-
-        function closeStatusModal() {
-            document.getElementById('statusModal').classList.add('hidden');
-        }
-
-        async function updateStatus() {
-            const status = document.getElementById('statusSelect').value;
-            
+        
+        window.filterHistory = function(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active');
+            let filtered = completedTasks;
+            const today = new Date();
+            if (filter === 'week') { const weekAgo = new Date(today.setDate(today.getDate() - 7)).toISOString().split('T')[0]; filtered = completedTasks.filter(c => c.returnedAt?.split('T')[0] >= weekAgo || c.endDate >= weekAgo); }
+            else if (filter === 'month') { const monthAgo = new Date(today.setMonth(today.getMonth() - 1)).toISOString().split('T')[0]; filtered = completedTasks.filter(c => c.returnedAt?.split('T')[0] >= monthAgo || c.endDate >= monthAgo); }
+            displayCompleted(filtered);
+        };
+        
+        // Camera functions for walk-in
+        window.useCamera = async function() { document.getElementById('cameraContainer').classList.remove('hidden'); document.getElementById('fileUploadContainer').classList.add('hidden'); try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }); document.getElementById('video').srcObject = stream; } catch(e) { alert('Unable to access camera'); useFileUpload(); } };
+        window.useFileUpload = function() { stopCamera(); document.getElementById('cameraContainer').classList.add('hidden'); document.getElementById('fileUploadContainer').classList.remove('hidden'); };
+        window.capturePhoto = function() { const video = document.getElementById('video'); const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0); licenseImage = canvas.toDataURL('image/jpeg'); document.getElementById('licenseImage').src = licenseImage; document.getElementById('licensePreview').classList.remove('hidden'); stopCamera(); };
+        window.handleFileSelect = function(event) { const file = event.target.files[0]; if(file) { const reader = new FileReader(); reader.onload = function(e) { licenseImage = e.target.result; document.getElementById('licenseImage').src = licenseImage; document.getElementById('licensePreview').classList.remove('hidden'); }; reader.readAsDataURL(file); } };
+        function stopCamera() { if(stream) { stream.getTracks().forEach(track => track.stop()); stream = null; } }
+        
+        window.submitWalkin = async function(event) {
+            event.preventDefault();
+            if (!licenseImage) { alert('Please capture or upload driver\'s license'); return; }
+            const vehicleId = document.getElementById('walkinVehicle').value;
+            const selectedVehicle = vehicles.find(v => v.id == vehicleId);
+            const walkinData = { fullName: document.getElementById('walkinName').value, phone: document.getElementById('walkinPhone').value, address: document.getElementById('walkinAddress').value, facebook: document.getElementById('walkinFacebook').value, emergency: document.getElementById('walkinEmergency').value, vehicleId: vehicleId, vehicleName: selectedVehicle ? `${selectedVehicle.brand} ${selectedVehicle.model}` : '', vehicleBrand: selectedVehicle?.brand || '', vehicleModel: selectedVehicle?.model || '', vehiclePlate: selectedVehicle?.plateNumber || '', pickupDate: document.getElementById('walkinPickupDate').value, returnDate: document.getElementById('walkinReturnDate').value, pickupTime: document.getElementById('walkinTime').value, licenseImage: licenseImage, status: 'pending', type: 'walkin', staffId: currentUser?.id };
             try {
-                const response = await fetch(`/api/bookings/${selectedBookingId}/status`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status })
-                });
-                
-                if (response.ok) {
-                    closeStatusModal();
-                    loadBookings();
-                }
-            } catch (error) {
-                alert('Error updating status');
-            }
-        }
-
-        function viewDetails(bookingNumber) {
-            alert(`Viewing details for booking: ${bookingNumber}\n(This feature coming soon)`);
-        }
+                const response = await fetch('/api/walkin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(walkinData) });
+                if (response.ok) { alert('Walk-in request submitted successfully! Admin will be notified.'); clearWalkinForm(); showSection('tasks'); }
+                else { alert('Error submitting walk-in request'); }
+            } catch(error) { alert('Connection error'); }
+        };
+        
+        window.clearWalkinForm = function() { document.getElementById('walkinForm').reset(); licenseImage = null; document.getElementById('licensePreview').classList.add('hidden'); stopCamera(); };
+        window.refreshData = async function() { await loadBookings(); };
+        window.logout = function() { localStorage.clear(); window.location.href = '/pages/staff-login.html'; };
+        function updateDateTime() { document.getElementById('currentDateTime').textContent = new Date().toLocaleString(); }
+        setInterval(updateDateTime, 1000); updateDateTime();
+        document.addEventListener('DOMContentLoaded', () => { showSection('tasks'); });
     </script>
 </body>
 </html>

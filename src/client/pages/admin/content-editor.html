@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Editor - ABI Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-blue-900 text-white p-6">
+            <h2 class="text-2xl font-bold mb-8">ABI Admin</h2>
+            <nav class="space-y-4">
+                <a href="/pages/dashboard/admin.html" class="block py-2 px-4 hover:bg-blue-800 rounded">Dashboard</a>
+                <a href="/pages/admin/content-editor.html" class="block py-2 px-4 bg-blue-700 rounded">Content Editor</a>
+                <a href="#" onclick="logout()" class="block py-2 px-4 hover:bg-blue-800 rounded">Logout</a>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <h1 class="text-3xl font-bold mb-8">Website Content Editor</h1>
+            
+            <!-- Tabs -->
+            <div class="flex border-b mb-8">
+                <button onclick="showTab('hero')" class="tab-btn px-6 py-3 font-semibold text-blue-800 border-b-2 border-blue-800" data-tab="hero">Hero Section</button>
+                <button onclick="showTab('featured')" class="tab-btn px-6 py-3 font-semibold text-gray-600 hover:text-blue-800" data-tab="featured">Featured Vehicles</button>
+                <button onclick="showTab('customers')" class="tab-btn px-6 py-3 font-semibold text-gray-600 hover:text-blue-800" data-tab="customers">Customer Section</button>
+                <button onclick="showTab('footer')" class="tab-btn px-6 py-3 font-semibold text-gray-600 hover:text-blue-800" data-tab="footer">Footer</button>
+            </div>
+            
+            <!-- Hero Section Tab -->
+            <div id="tab-hero" class="tab-content">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-6">Hero Section</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Hero Title</label>
+                            <input type="text" id="heroTitle" class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Hero Subtitle</label>
+                            <input type="text" id="heroSubtitle" class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-4">Hero Car Images (for looping background)</label>
+                            <div id="heroImages" class="grid grid-cols-3 gap-4 mb-4"></div>
+                            
+                            <div class="flex gap-2">
+                                <input type="text" id="newHeroImage" placeholder="Image URL" class="flex-1 px-4 py-2 border rounded-lg">
+                                <button onclick="addHeroImage()" class="bg-blue-800 text-white px-6 py-2 rounded-lg hover:bg-blue-900">
+                                    Add Image
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="saveHeroContent()" class="mt-6 bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700">
+                        Save Hero Changes
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Footer Tab -->
+            <div id="tab-footer" class="tab-content hidden">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-bold mb-6">Footer Information</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">About Text</label>
+                            <textarea id="footerAbout" rows="3" class="w-full px-4 py-2 border rounded-lg"></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+                            <input type="text" id="footerPhone" class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="footerEmail" class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Address</label>
+                            <input type="text" id="footerAddress" class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Facebook Link</label>
+                            <input type="text" id="footerFacebook" class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Instagram Link</label>
+                            <input type="text" id="footerInstagram" class="w-full px-4 py-2 border rounded-lg">
+                        </div>
+                    </div>
+                    
+                    <button onclick="saveFooterContent()" class="mt-6 bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700">
+                        Save Footer Changes
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Save Message -->
+            <div id="message" class="mt-4 text-sm hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentContent = {};
+        
+        // Check authentication
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!token || user.role !== 'admin') {
+            window.location.href = '/pages/login.html';
+        }
+        
+        // Load content on page load
+        document.addEventListener('DOMContentLoaded', loadContent);
+        
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('text-blue-800', 'border-b-2', 'border-blue-800');
+                btn.classList.add('text-gray-600');
+            });
+            event.target.classList.add('text-blue-800', 'border-b-2', 'border-blue-800');
+        }
+        
+        // Load content from API
+        async function loadContent() {
+            try {
+                const response = await fetch('/api/content');
+                currentContent = await response.json();
+                
+                // Populate hero section
+                document.getElementById('heroTitle').value = currentContent.hero?.title || '';
+                document.getElementById('heroSubtitle').value = currentContent.hero?.subtitle || '';
+                
+                // Display hero images
+                displayHeroImages(currentContent.hero?.carImages || []);
+                
+                // Populate footer
+                document.getElementById('footerAbout').value = currentContent.footer?.about || '';
+                document.getElementById('footerPhone').value = currentContent.footer?.phone || '';
+                document.getElementById('footerEmail').value = currentContent.footer?.email || '';
+                document.getElementById('footerAddress').value = currentContent.footer?.address || '';
+                document.getElementById('footerFacebook').value = currentContent.footer?.facebook || '';
+                document.getElementById('footerInstagram').value = currentContent.footer?.instagram || '';
+                
+            } catch (error) {
+                showMessage('Error loading content', true);
+            }
+        }
+        
+        // Display hero images
+        function displayHeroImages(images) {
+            const container = document.getElementById('heroImages');
+            if (images.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 col-span-3">No images added yet</p>';
+                return;
+            }
+            
+            container.innerHTML = images.map(img => `
+                <div class="relative group">
+                    <img src="${img.url}" class="w-full h-32 object-cover rounded-lg">
+                    <button onclick="deleteHeroImage(${img.id})" 
+                            class="absolute top-2 right-2 bg-red-600 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        // Add hero image
+        async function addHeroImage() {
+            const url = document.getElementById('newHeroImage').value;
+            if (!url) return;
+            
+            try {
+                const response = await fetch('/api/content/hero-images', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ imageUrl: url })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    document.getElementById('newHeroImage').value = '';
+                    displayHeroImages(data.images);
+                    showMessage('Image added successfully', false);
+                }
+            } catch (error) {
+                showMessage('Error adding image', true);
+            }
+        }
+        
+        // Delete hero image
+        async function deleteHeroImage(id) {
+            if (!confirm('Delete this image?')) return;
+            
+            try {
+                const response = await fetch(`/api/content/hero-images/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    displayHeroImages(data.images);
+                    showMessage('Image deleted', false);
+                }
+            } catch (error) {
+                showMessage('Error deleting image', true);
+            }
+        }
+        
+        // Save hero content
+        async function saveHeroContent() {
+            const updates = {
+                hero: {
+                    title: document.getElementById('heroTitle').value,
+                    subtitle: document.getElementById('heroSubtitle').value,
+                    carImages: currentContent.hero?.carImages || []
+                }
+            };
+            
+            await saveContent(updates);
+        }
+        
+        // Save footer content
+        async function saveFooterContent() {
+            const updates = {
+                footer: {
+                    about: document.getElementById('footerAbout').value,
+                    phone: document.getElementById('footerPhone').value,
+                    email: document.getElementById('footerEmail').value,
+                    address: document.getElementById('footerAddress').value,
+                    facebook: document.getElementById('footerFacebook').value,
+                    instagram: document.getElementById('footerInstagram').value
+                }
+            };
+            
+            await saveContent(updates);
+        }
+        
+        // Generic save function
+        async function saveContent(updates) {
+            try {
+                const response = await fetch('/api/content', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (response.ok) {
+                    showMessage('Changes saved successfully!', false);
+                    loadContent(); // Reload to get latest
+                } else {
+                    showMessage('Error saving changes', true);
+                }
+            } catch (error) {
+                showMessage('Error saving changes', true);
+            }
+        }
+        
+        function showMessage(text, isError) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `text-sm p-3 rounded ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`;
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/pages/login.html';
+        }
+    </script>
+</body>
+</html>

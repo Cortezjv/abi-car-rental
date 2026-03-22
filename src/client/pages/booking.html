@@ -6,250 +6,813 @@
     <title>Book a Vehicle - ABI Car Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background-color: #1e3a8a;
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .step-title {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .step.active .step-title {
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+        
+        .step-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e5e7eb;
+            z-index: 0;
+        }
+        
+        .camera-preview {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            background-color: #f3f4f6;
+            border: 2px dashed #9ca3af;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .camera-preview video, .camera-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .agreement-box {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: #f9fafb;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e3a8a;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-field {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center h-16">
-                <h1 class="text-xl font-bold text-blue-600">ABI Rentals</h1>
-                <div class="space-x-4">
-                    <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
-                    <a href="/pages/vehicles.html" class="text-gray-700 hover:text-blue-600">Vehicles</a>
-                    <a href="/pages/booking.html" class="text-blue-600 font-semibold">Book Now</a>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    <i class="fas fa-car text-3xl text-blue-800 mr-2"></i>
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-blue-900">ABI</h1>
+                        <p class="text-xs text-gray-500 -mt-1">Car & Van Rental</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/" class="text-gray-700 hover:text-blue-800 font-medium transition">Home</a>
+                    <a href="/pages/vehicles.html" class="text-gray-700 hover:text-blue-800 font-medium transition">Vehicles</a>
+                    <a href="/pages/booking.html" class="text-blue-800 font-semibold border-b-2 border-blue-800">Book Now</a>
+                    <a href="/pages/login.html" class="text-gray-600 hover:text-blue-800">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-center mb-8">Book Your Vehicle</h1>
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8">Complete Your Booking</h1>
         
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Booking Form -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-lg shadow-lg p-6">
-                    <h2 class="text-xl font-semibold mb-6">Rental Details</h2>
-                    
-                    <form id="bookingForm" class="space-y-4">
-                        <!-- Vehicle Selection -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Select Vehicle</label>
-                            <select id="vehicleId" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <option value="">Choose a vehicle...</option>
-                            </select>
-                        </div>
-
-                        <!-- Dates -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Pick-up Date</label>
-                                <input type="date" id="pickupDate" required 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Return Date</label>
-                                <input type="date" id="returnDate" required 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- Customer Information -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Full Name</label>
-                                <input type="text" id="customerName" required 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Email</label>
-                                <input type="email" id="customerEmail" required 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Phone Number</label>
-                                <input type="tel" id="customerPhone" required 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Driver's License</label>
-                                <input type="text" id="licenseNumber" required 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-
-                        <!-- Special Requests -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Special Requests (Optional)</label>
-                            <textarea id="specialRequests" rows="3" 
-                                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" 
-                                class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
-                            Complete Booking
-                        </button>
-                    </form>
+        <!-- Selected Vehicle Summary -->
+        <div id="vehicleSummary" class="bg-white rounded-lg shadow-lg p-6 mb-8 hidden">
+            <h2 class="text-xl font-bold mb-4">Selected Vehicle</h2>
+            <div class="flex items-center space-x-4">
+                <img id="selectedVehicleImage" src="" alt="Vehicle" class="w-24 h-24 object-cover rounded-lg">
+                <div>
+                    <h3 id="selectedVehicleName" class="font-bold text-lg"></h3>
+                    <p id="selectedVehicleDetails" class="text-gray-600"></p>
                 </div>
             </div>
+        </div>
 
-            <!-- Booking Summary -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow-lg p-6 sticky top-24">
-                    <h2 class="text-xl font-semibold mb-4">Booking Summary</h2>
+        <!-- Step Indicator -->
+        <div class="step-indicator mb-8">
+            <div class="step-line"></div>
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-title">Booking Details</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-title">License Upload</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-title">Review & Agree</div>
+            </div>
+            <div class="step" id="step4">
+                <div class="step-number">4</div>
+                <div class="step-title">Confirmation</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Booking Details Form -->
+        <div id="step1Form" class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-6">Renter Information</h2>
+            
+            <form id="bookingForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Full Name *</label>
+                        <input type="text" id="fullName" required 
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter your full name">
+                    </div>
                     
-                    <!-- Selected Vehicle -->
-                    <div id="selectedVehicle" class="mb-4 p-3 bg-gray-50 rounded-lg">
-                        <p class="text-gray-500 text-sm">No vehicle selected</p>
-                    </div>
-
-                    <!-- Price Breakdown -->
-                    <div id="priceBreakdown" class="space-y-2 mb-4">
-                        <div class="flex justify-between text-gray-600">
-                            <span>Daily Rate:</span>
-                            <span id="dailyRate">$0</span>
-                        </div>
-                        <div class="flex justify-between text-gray-600">
-                            <span>Number of Days:</span>
-                            <span id="numberOfDays">0</span>
-                        </div>
-                        <div class="border-t pt-2 mt-2">
-                            <div class="flex justify-between font-bold text-lg">
-                                <span>Total:</span>
-                                <span id="totalPrice">$0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Insurance Info -->
-                    <div class="text-sm text-gray-500 mt-4 p-3 bg-blue-50 rounded-lg">
-                        <i class="fas fa-shield-alt text-blue-600 mr-2"></i>
-                        All bookings include comprehensive insurance coverage
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Contact Number *</label>
+                        <input type="tel" id="contactNumber" required 
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                               readonly>
                     </div>
                 </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Complete Address *</label>
+                    <input type="text" id="address" required placeholder="House/Unit No., Street, Barangay, City"
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Facebook Name *</label>
+                        <input type="text" id="facebookName" required placeholder="John Doe"
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Emergency Contact Person *</label>
+                        <input type="text" id="emergencyPerson" required placeholder="Full name"
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Emergency Contact Number *</label>
+                    <input type="tel" id="emergencyNumber" required placeholder="09123456789"
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <h3 class="text-lg font-bold mt-6 mb-4">Rental Schedule</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Start Date *</label>
+                        <input type="date" id="startDate" required 
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                               onchange="setMinReturnDate()">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Return Date *</label>
+                        <input type="date" id="endDate" required 
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <p class="text-xs text-gray-500 mt-1">Can be extended upon admin approval</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Pickup Time *</label>
+                    <input type="time" id="pickupTime" required 
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Vehicle must be returned at the same time on return date</p>
+                </div>
+
+                <h3 class="text-lg font-bold mt-6 mb-4">Additional Options</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Delivery Option *</label>
+                        <select id="deliveryOption" required class="w-full px-4 py-2 border rounded-lg">
+                            <option value="">Select option</option>
+                            <option value="pickup">Pickup at Branch</option>
+                            <option value="delivery">Delivery to Address</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Driver Option *</label>
+                        <select id="driverOption" required class="w-full px-4 py-2 border rounded-lg">
+                            <option value="">Select option</option>
+                            <option value="without">Without Driver (Self-drive)</option>
+                            <option value="with">With Driver</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Next Button -->
+                <div class="mt-8">
+                    <button type="button" onclick="validateAndGoToStep2()" 
+                            class="w-full bg-blue-800 text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition">
+                        Next: Upload Driver's License
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Step 2: License Upload (Camera + File) -->
+        <div id="step2Form" class="hidden bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-6">Upload Driver's License</h2>
+            
+            <div class="space-y-6">
+                <!-- Camera/Upload Options -->
+                <div class="flex space-x-4 mb-4">
+                    <button onclick="useCamera()" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-camera mr-2"></i>Use Camera
+                    </button>
+                    <button onclick="useFileUpload()" class="flex-1 bg-gray-600 text-white py-2 rounded-lg hover:bg-gray-700">
+                        <i class="fas fa-upload mr-2"></i>Upload File
+                    </button>
+                </div>
+
+                <!-- Camera Preview -->
+                <div id="cameraContainer" class="hidden">
+                    <div class="camera-preview" id="cameraPreview">
+                        <video id="video" autoplay playsinline></video>
+                    </div>
+                    <div class="flex space-x-4 mt-4">
+                        <button onclick="capturePhoto()" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+                            <i class="fas fa-camera mr-2"></i>Capture
+                        </button>
+                        <button onclick="stopCamera()" class="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">
+                            <i class="fas fa-stop mr-2"></i>Stop Camera
+                        </button>
+                    </div>
+                </div>
+
+                <!-- File Upload -->
+                <div id="fileUploadContainer" class="hidden">
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition cursor-pointer"
+                         onclick="document.getElementById('licenseFile').click()">
+                        <i class="fas fa-cloud-upload-alt text-5xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 mb-2">Click to upload driver's license image</p>
+                        <p class="text-xs text-gray-500">Supported formats: JPG, PNG, GIF (Max 10MB)</p>
+                        <input type="file" id="licenseFile" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                    </div>
+                </div>
+
+                <!-- Captured/Uploaded Image Preview -->
+                <div id="licensePreview" class="hidden">
+                    <h3 class="font-semibold mb-2">License Image Preview:</h3>
+                    <img id="licenseImage" src="" alt="License" class="w-full max-w-md mx-auto rounded-lg border shadow-lg">
+                    <button onclick="removeLicense()" class="mt-2 text-red-600 text-sm hover:text-red-800">
+                        <i class="fas fa-times mr-1"></i>Remove and try again
+                    </button>
+                </div>
+
+                <!-- Error Message -->
+                <div id="licenseError" class="hidden bg-red-100 text-red-700 p-3 rounded-lg text-sm">
+                    Please upload a valid driver's license image
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex space-x-4 mt-8">
+                    <button onclick="goToStep1()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600">
+                        Back
+                    </button>
+                    <button onclick="validateAndGoToStep3()" id="nextToAgreementBtn" disabled
+                            class="flex-1 bg-blue-800 text-white py-2 rounded-lg opacity-50 cursor-not-allowed">
+                        Next: Review Agreement
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Agreement -->
+        <div id="step3Form" class="hidden bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-6">Terms and Agreement</h2>
+            
+            <div class="agreement-box" id="agreementBox" onscroll="checkAgreementScroll()">
+                <!-- Content will be loaded from database -->
+                <div class="text-center py-8">
+                    <i class="fas fa-spinner fa-spin text-3xl text-gray-400"></i>
+                    <p class="text-gray-500 mt-2">Loading agreement...</p>
+                </div>
+            </div>
+            
+            <div class="flex items-start mb-4">
+                <input type="checkbox" id="agreeTerms" disabled class="mt-1 mr-2">
+                <label for="agreeTerms" class="text-gray-700 text-sm">
+                    I have read and agree to the Terms and Agreement above
+                </label>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button onclick="goToStep2()" class="flex-1 bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600">
+                    Back
+                </button>
+                <button onclick="submitBooking()" id="submitBookingBtn" disabled
+                        class="flex-1 bg-green-600 text-white py-2 rounded-lg opacity-50 cursor-not-allowed">
+                    Confirm Booking
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: Confirmation/Loading -->
+        <div id="step4Form" class="hidden bg-white rounded-lg shadow-lg p-6 text-center">
+            <div class="loading-spinner"></div>
+            <h2 class="text-xl font-bold mt-6">Processing Your Booking</h2>
+            <p class="text-gray-600 mt-2">Please wait while we submit your booking request...</p>
+            <p class="text-sm text-gray-500 mt-4">You will receive an SMS confirmation once the admin approves your booking.</p>
+        </div>
+
+        <!-- Success/Error Modal -->
+        <div id="resultModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full">
+                <div id="resultIcon" class="text-6xl text-center mb-4"></div>
+                <h3 id="resultTitle" class="text-2xl font-bold text-center mb-2"></h3>
+                <p id="resultMessage" class="text-gray-600 text-center mb-6"></p>
+                <button onclick="closeResultModal()" class="w-full bg-blue-800 text-white py-2 rounded-lg hover:bg-blue-900">
+                    OK
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        let vehicles = [];
+        // ========== GLOBAL VARIABLES ==========
+        let currentUser = null;
         let selectedVehicle = null;
+        let licenseImageData = null;
+        let stream = null;
+        let bookingData = {};
 
-        // Load vehicles on page load
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadVehicles();
-            setupDatePickers();
-        });
-
-        // Load vehicles from API
-        async function loadVehicles() {
-            try {
-                const response = await fetch('/api/vehicles');
-                vehicles = await response.json();
-                
-                const select = document.getElementById('vehicleId');
-                select.innerHTML = '<option value="">Choose a vehicle...</option>' + 
-                    vehicles.map(v => `<option value="${v.id}">${v.name} - $${v.price_per_day}/day (${v.seats} seats)</option>`).join('');
-                
-                // Add event listener for vehicle selection
-                select.addEventListener('change', (e) => {
-                    const vehicleId = parseInt(e.target.value);
-                    selectedVehicle = vehicles.find(v => v.id === vehicleId);
-                    updateSummary();
-                });
-            } catch (error) {
-                console.error('Error loading vehicles:', error);
-            }
-        }
-
-        // Setup date pickers with min dates
-        function setupDatePickers() {
-            const today = new Date().toISOString().split('T')[0];
-            const pickupDate = document.getElementById('pickupDate');
-            const returnDate = document.getElementById('returnDate');
+        // ========== CHECK LOGIN STATUS ==========
+        (function checkAuth() {
+            const token = localStorage.getItem('token');
+            const userStr = localStorage.getItem('user');
             
-            pickupDate.min = today;
-            pickupDate.value = today;
-            
-            pickupDate.addEventListener('change', () => {
-                returnDate.min = pickupDate.value;
-                returnDate.value = pickupDate.value;
-                updateSummary();
-            });
-            
-            returnDate.addEventListener('change', updateSummary);
-        }
-
-        // Update booking summary
-        function updateSummary() {
-            if (!selectedVehicle) {
-                document.getElementById('selectedVehicle').innerHTML = 
-                    '<p class="text-gray-500 text-sm">No vehicle selected</p>';
+            if (!token || !userStr) {
+                window.location.href = '/pages/login.html?redirect=booking';
                 return;
             }
-
-            // Show selected vehicle
-            document.getElementById('selectedVehicle').innerHTML = `
-                <p class="font-semibold">${selectedVehicle.name}</p>
-                <p class="text-sm text-gray-600">${selectedVehicle.seats} seats • ${selectedVehicle.transmission}</p>
-            `;
-
-            // Calculate days
-            const pickup = new Date(document.getElementById('pickupDate').value);
-            const ret = new Date(document.getElementById('returnDate').value);
             
-            if (pickup && ret && ret >= pickup) {
-                const days = Math.ceil((ret - pickup) / (1000 * 60 * 60 * 24)) + 1;
-                const total = days * selectedVehicle.price_per_day;
-                
-                document.getElementById('dailyRate').textContent = `$${selectedVehicle.price_per_day}`;
-                document.getElementById('numberOfDays').textContent = days;
-                document.getElementById('totalPrice').textContent = `$${total}`;
+            try {
+                currentUser = JSON.parse(userStr);
+                // Auto-fill contact number from registered user
+                if (currentUser.phone) {
+                    document.getElementById('contactNumber').value = currentUser.phone;
+                }
+            } catch (e) {
+                window.location.href = '/pages/login.html?redirect=booking';
             }
-        }
+        })();
 
-        // Handle form submission
-        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        // ========== LOAD SELECTED VEHICLE ==========
+        (function loadSelectedVehicle() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const vehicleId = urlParams.get('vehicle');
             
-            if (!selectedVehicle) {
-                alert('Please select a vehicle');
+            if (!vehicleId) {
+                showResult('error', 'No Vehicle Selected', 'Please select a vehicle first.');
                 return;
             }
-
-            const bookingData = {
-                vehicleId: selectedVehicle.id,
-                customerName: document.getElementById('customerName').value,
-                customerEmail: document.getElementById('customerEmail').value,
-                customerPhone: document.getElementById('customerPhone').value,
-                licenseNumber: document.getElementById('licenseNumber').value,
-                pickupDate: document.getElementById('pickupDate').value,
-                returnDate: document.getElementById('returnDate').value,
-                specialRequests: document.getElementById('specialRequests').value
-            };
-
-            try {
-                const response = await fetch('/api/bookings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(bookingData)
+            
+            fetch('/api/vehicles')
+                .then(res => res.json())
+                .then(vehicles => {
+                    selectedVehicle = vehicles.find(v => v.id == vehicleId);
+                    if (selectedVehicle) {
+                        document.getElementById('vehicleSummary').classList.remove('hidden');
+                        document.getElementById('selectedVehicleImage').src = 
+                            selectedVehicle.images?.[0] || selectedVehicle.image_url || 'https://via.placeholder.com/100';
+                        document.getElementById('selectedVehicleName').textContent = selectedVehicle.name;
+                        document.getElementById('selectedVehicleDetails').textContent = 
+                            `${selectedVehicle.brand || ''} ${selectedVehicle.model || ''} • ${selectedVehicle.color || ''} • ${selectedVehicle.seats} seats • ${selectedVehicle.transmission}`;
+                    }
                 });
+        })();
 
-                if (response.ok) {
-                    const result = await response.json();
-                    alert(`Booking successful! Your booking number is: ${result.bookingNumber}`);
-                    window.location.href = '/';
-                } else {
-                    alert('Booking failed. Please try again.');
+        // ========== LOAD AGREEMENT FROM CONTENT EDITOR ==========
+        async function loadAgreement() {
+            try {
+                const response = await fetch('/api/content');
+                const content = await response.json();
+                
+                if (content.agreement && content.agreement.terms) {
+                    document.getElementById('agreementBox').innerHTML = content.agreement.terms;
                 }
             } catch (error) {
-                alert('Error creating booking');
+                console.error('Error loading agreement:', error);
             }
+        }
+
+        // ========== SET MIN RETURN DATE ==========
+        function setMinReturnDate() {
+            const startDate = document.getElementById('startDate').value;
+            if (startDate) {
+                document.getElementById('endDate').min = startDate;
+            }
+        }
+
+        // ========== STEP NAVIGATION ==========
+        function goToStep1() {
+            document.getElementById('step1Form').classList.remove('hidden');
+            document.getElementById('step2Form').classList.add('hidden');
+            document.getElementById('step3Form').classList.add('hidden');
+            document.getElementById('step4Form').classList.add('hidden');
+            updateStepIndicator(1);
+        }
+
+        function goToStep2() {
+            document.getElementById('step1Form').classList.add('hidden');
+            document.getElementById('step2Form').classList.remove('hidden');
+            document.getElementById('step3Form').classList.add('hidden');
+            document.getElementById('step4Form').classList.add('hidden');
+            updateStepIndicator(2);
+        }
+
+        function goToStep3() {
+            document.getElementById('step1Form').classList.add('hidden');
+            document.getElementById('step2Form').classList.add('hidden');
+            document.getElementById('step3Form').classList.remove('hidden');
+            document.getElementById('step4Form').classList.add('hidden');
+            updateStepIndicator(3);
+        }
+
+        function goToStep4() {
+            document.getElementById('step1Form').classList.add('hidden');
+            document.getElementById('step2Form').classList.add('hidden');
+            document.getElementById('step3Form').classList.add('hidden');
+            document.getElementById('step4Form').classList.remove('hidden');
+            updateStepIndicator(4);
+        }
+
+        function updateStepIndicator(step) {
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                if (i < step) {
+                    stepEl.classList.add('completed');
+                    stepEl.classList.remove('active');
+                } else if (i === step) {
+                    stepEl.classList.add('active');
+                    stepEl.classList.remove('completed');
+                } else {
+                    stepEl.classList.remove('active', 'completed');
+                }
+            }
+        }
+
+        // ========== VALIDATE STEP 1 WITH ERROR STOP ==========
+        function validateAndGoToStep2() {
+            const required = [
+                'fullName', 'contactNumber', 'address', 'facebookName', 
+                'emergencyPerson', 'emergencyNumber', 'startDate', 'endDate', 'pickupTime'
+            ];
+            
+            let isValid = true;
+            let firstError = null;
+            
+            // Clear all previous error styling
+            document.querySelectorAll('.error-field').forEach(el => {
+                el.classList.remove('error-field', 'border-red-500');
+            });
+            
+            for (const field of required) {
+                const el = document.getElementById(field);
+                if (!el.value || el.value.trim() === '') {
+                    el.classList.add('border-red-500', 'error-field');
+                    isValid = false;
+                    if (!firstError) {
+                        firstError = el;
+                    }
+                }
+            }
+            
+            // Validate phone numbers (at least 10 digits)
+            const phoneFields = ['contactNumber', 'emergencyNumber'];
+            for (const field of phoneFields) {
+                const el = document.getElementById(field);
+                const value = el.value.replace(/\D/g, '');
+                if (value.length < 10) {
+                    el.classList.add('border-red-500', 'error-field');
+                    isValid = false;
+                    if (!firstError) {
+                        firstError = el;
+                    }
+                }
+            }
+            
+            // Validate dates
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (startDate && endDate && endDate < startDate) {
+                document.getElementById('endDate').classList.add('border-red-500', 'error-field');
+                isValid = false;
+                if (!firstError) {
+                    firstError = document.getElementById('endDate');
+                }
+                alert('Return date cannot be before start date');
+            }
+            
+            if (!isValid) {
+                // Scroll to first error
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+                
+                alert('Please fill in all required fields correctly.\nFields highlighted in red need attention.');
+                return;
+            }
+            
+            // Validate delivery and driver options
+            const deliveryOption = document.getElementById('deliveryOption').value;
+            const driverOption = document.getElementById('driverOption').value;
+            
+            if (!deliveryOption || !driverOption) {
+                alert('Please select delivery and driver options.');
+                return;
+            }
+            
+            // Save booking data
+            bookingData = {
+                vehicleId: selectedVehicle.id,
+                vehicleName: selectedVehicle.name,
+                vehicleBrand: selectedVehicle.brand,
+                vehicleColor: selectedVehicle.color,
+                vehiclePlate: selectedVehicle.plateNumber,
+                fullName: document.getElementById('fullName').value,
+                contactNumber: document.getElementById('contactNumber').value,
+                address: document.getElementById('address').value,
+                facebookName: document.getElementById('facebookName').value,
+                emergencyPerson: document.getElementById('emergencyPerson').value,
+                emergencyNumber: document.getElementById('emergencyNumber').value,
+                startDate: startDate,
+                endDate: endDate,
+                pickupTime: document.getElementById('pickupTime').value,
+                deliveryOption: deliveryOption,
+                driverOption: driverOption
+            };
+            
+            goToStep2();
+        }
+
+        // ========== CAMERA FUNCTIONS ==========
+        async function useCamera() {
+            document.getElementById('cameraContainer').classList.remove('hidden');
+            document.getElementById('fileUploadContainer').classList.add('hidden');
+            
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+            } catch (error) {
+                alert('Unable to access camera. Please use file upload instead.');
+                useFileUpload();
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            document.getElementById('cameraContainer').classList.add('hidden');
+        }
+
+        function useFileUpload() {
+            stopCamera();
+            document.getElementById('cameraContainer').classList.add('hidden');
+            document.getElementById('fileUploadContainer').classList.remove('hidden');
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            
+            // Compress to JPEG at 80% quality to reduce size
+            licenseImageData = canvas.toDataURL('image/jpeg', 0.8);
+            document.getElementById('licenseImage').src = licenseImageData;
+            document.getElementById('licensePreview').classList.remove('hidden');
+            document.getElementById('nextToAgreementBtn').disabled = false;
+            document.getElementById('nextToAgreementBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            stopCamera();
+        }
+
+        // ========== FILE UPLOAD HANDLING ==========
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showError('licenseError', 'File too large. Maximum size is 10MB');
+                document.getElementById('licenseFile').value = '';
+                return;
+            }
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                showError('licenseError', 'Please upload an image file');
+                document.getElementById('licenseFile').value = '';
+                return;
+            }
+            
+            // Clear any previous errors
+            document.getElementById('licenseError').classList.add('hidden');
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                licenseImageData = e.target.result;
+                document.getElementById('licenseImage').src = licenseImageData;
+                document.getElementById('licensePreview').classList.remove('hidden');
+                document.getElementById('nextToAgreementBtn').disabled = false;
+                document.getElementById('nextToAgreementBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeLicense() {
+            licenseImageData = null;
+            document.getElementById('licensePreview').classList.add('hidden');
+            document.getElementById('licenseFile').value = '';
+            document.getElementById('nextToAgreementBtn').disabled = true;
+            document.getElementById('nextToAgreementBtn').classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        function showError(elementId, message) {
+            const errorEl = document.getElementById(elementId);
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => errorEl.classList.add('hidden'), 3000);
+        }
+
+        function validateAndGoToStep3() {
+            if (!licenseImageData) {
+                showError('licenseError', 'Please capture or upload your driver\'s license image');
+                return;
+            }
+            goToStep3();
+        }
+
+        // ========== AGREEMENT SCROLL CHECK ==========
+        function checkAgreementScroll() {
+            const box = document.getElementById('agreementBox');
+            const scrollProgress = (box.scrollTop / (box.scrollHeight - box.clientHeight)) * 100;
+            
+            if (scrollProgress > 95) {
+                document.getElementById('agreeTerms').disabled = false;
+            }
+        }
+
+        document.getElementById('agreeTerms').addEventListener('change', function() {
+            document.getElementById('submitBookingBtn').disabled = !this.checked;
+            document.getElementById('submitBookingBtn').classList.toggle('opacity-50', !this.checked);
+            document.getElementById('submitBookingBtn').classList.toggle('cursor-not-allowed', !this.checked);
+        });
+
+        // ========== SUBMIT BOOKING ==========
+        async function submitBooking() {
+            if (!document.getElementById('agreeTerms').checked) {
+                alert('Please agree to the terms');
+                return;
+            }
+            
+            goToStep4();
+            
+            const completeBookingData = {
+                ...bookingData,
+                licenseImage: licenseImageData,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(completeBookingData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(
+                        'success',
+                        'Booking Submitted!',
+                        'Your booking request has been sent. The admin will contact you shortly to discuss the price and confirm your booking.'
+                    );
+                } else {
+                    showResult('error', 'Booking Failed', data.error || 'Please try again');
+                }
+            } catch (error) {
+                showResult('error', 'Connection Error', 'Please check your internet connection');
+            }
+        }
+
+        // ========== RESULT MODAL ==========
+        function showResult(type, title, message) {
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            
+            icon.innerHTML = type === 'success' ? '✅' : '❌';
+            resultTitle.textContent = title;
+            resultMessage.textContent = message;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeResultModal() {
+            document.getElementById('resultModal').classList.add('hidden');
+            if (document.getElementById('resultTitle').textContent.includes('success')) {
+                window.location.href = '/';
+            }
+        }
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set min date for start date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').min = today;
+            
+            // Load agreement from content editor
+            loadAgreement();
         });
     </script>
 </body>

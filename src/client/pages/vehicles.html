@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Browse Vehicles - ABI Car Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        
+        /* Navigation - Simple and clean */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .logo i {
+            font-size: 28px;
+            color: #1e3a8a;
+        }
+        
+        .logo span {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: #1e3a8a;
+        }
+        
+        .nav-link.active {
+            color: #1e3a8a;
+            font-weight: 600;
+        }
+        
+        .btn-outline {
+            padding: 8px 20px;
+            border: 1px solid #1e3a8a;
+            border-radius: 30px;
+            color: #1e3a8a;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-outline:hover {
+            background: #1e3a8a;
+            color: white;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            padding: 60px 24px;
+            text-align: center;
+        }
+        
+        .page-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .page-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        /* Filters */
+        .filters-section {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid #f0f0f0;
+        }
+        
+        .filters-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .filters-title i {
+            margin-right: 10px;
+            color: #1e3a8a;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 6px;
+        }
+        
+        .filter-select {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+        
+        .filter-input {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .filter-input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+        
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .filter-tag {
+            background: #e8f0fe;
+            color: #1e3a8a;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filter-tag i {
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .clear-filters {
+            color: #dc2626;
+            background: #fee2e2;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+        }
+        
+        /* Results Bar */
+        .results-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .results-count {
+            color: #666;
+            font-size: 15px;
+        }
+        
+        .results-count span {
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        
+        .sort-select {
+            padding: 10px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        /* Vehicle Grid */
+        .vehicles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .vehicle-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .vehicle-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+            border-color: #1e3a8a;
+        }
+        
+        .vehicle-image-container {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            background: #f8fafc;
+            cursor: pointer;
+        }
+        
+        .vehicle-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .vehicle-image-container:hover .vehicle-image {
+            transform: scale(1.05);
+        }
+        
+        .vehicle-type-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(30, 58, 138, 0.9);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+            backdrop-filter: blur(4px);
+            z-index: 2;
+        }
+        
+        .image-count-badge {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            backdrop-filter: blur(4px);
+            z-index: 2;
+            cursor: pointer;
+        }
+        
+        .image-count-badge i {
+            font-size: 12px;
+        }
+        
+        .vehicle-content {
+            padding: 20px;
+        }
+        
+        .vehicle-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .vehicle-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .vehicle-detail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .vehicle-detail i {
+            color: #1e3a8a;
+            width: 16px;
+        }
+        
+        .vehicle-specs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .vehicle-spec {
+            text-align: center;
+            padding: 8px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .vehicle-spec-value {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .vehicle-spec-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .vehicle-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .vehicle-plate {
+            font-family: monospace;
+            font-size: 14px;
+            color: #666;
+            background: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 6px;
+        }
+        
+        .btn-book {
+            background: #1e3a8a;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-book:hover {
+            background: #2563eb;
+        }
+        
+        .btn-book i {
+            font-size: 12px;
+        }
+        
+        /* Image Gallery Modal */
+        .gallery-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gallery-modal.active {
+            display: flex;
+        }
+        
+        .gallery-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .gallery-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+        }
+        
+        .gallery-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        .gallery-nav:hover {
+            background: rgba(0,0,0,0.8);
+        }
+        
+        .gallery-prev {
+            left: 20px;
+        }
+        
+        .gallery-next {
+            right: 20px;
+        }
+        
+        .gallery-counter {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 14px;
+        }
+        
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .no-results i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 16px;
+        }
+        
+        .no-results h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .no-results p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        /* Load More */
+        .load-more-container {
+            text-align: center;
+            margin-top: 32px;
+        }
+        
+        .btn-load-more {
+            background: white;
+            color: #1e3a8a;
+            padding: 14px 40px;
+            border: 2px solid #1e3a8a;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-load-more:hover {
+            background: #1e3a8a;
+            color: white;
+        }
+        
+        .btn-load-more:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1e293b;
+            color: white;
+            padding: 48px 24px 24px;
+            margin-top: 60px;
+        }
+        
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+        
+        .footer-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #94a3b8;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 8px;
+        }
+        
+        .footer-section ul li a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .footer-section ul li a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            max-width: 1280px;
+            margin: 32px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid #334155;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .vehicles-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filters-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: flex;
+                gap: 12px;
+            }
+            
+            .nav-link {
+                font-size: 14px;
+            }
+            
+            .btn-outline {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .page-title {
+                font-size: 28px;
+            }
+            
+            .page-subtitle {
+                font-size: 16px;
+            }
+            
+            .vehicles-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .results-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .sort-select {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .nav-links {
+                gap: 8px;
+            }
+            
+            .nav-link {
+                font-size: 12px;
+            }
+            
+            .btn-outline {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .vehicle-specs {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .vehicle-footer {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+            
+            .btn-book {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Simple Navigation - No Book Now button in navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <i class="fas fa-car"></i>
+                <span>ABI Rentals</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/pages/vehicles.html" class="nav-link active">Vehicles</a>
+                <div id="navAuth"></div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Page Header -->
+    <section class="page-header">
+        <h1 class="page-title">Our Vehicle Fleet</h1>
+        <p class="page-subtitle">Browse our collection of quality vehicles for your journey</p>
+    </section>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filters-title">
+                <i class="fas fa-sliders-h"></i>
+                Filter Vehicles
+            </div>
+            
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Search</label>
+                    <input type="text" id="searchInput" class="filter-input" placeholder="Search by name, brand...">
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Vehicle Type</label>
+                    <select id="typeFilter" class="filter-select">
+                        <option value="all">All Types</option>
+                        <option value="car">Cars</option>
+                        <option value="suv">SUVs</option>
+                        <option value="van">Vans</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Transmission</label>
+                    <select id="transmissionFilter" class="filter-select">
+                        <option value="all">All</option>
+                        <option value="manual">Manual</option>
+                        <option value="automatic">Automatic</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Seats</label>
+                    <select id="seatsFilter" class="filter-select">
+                        <option value="all">Any</option>
+                        <option value="5">5 Seats</option>
+                        <option value="7">7 Seats</option>
+                        <option value="8">8+ Seats</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="active-filters" id="activeFilters"></div>
+        </div>
+        
+        <!-- Results Bar -->
+        <div class="results-bar">
+            <div class="results-count" id="resultsCount">
+                Loading vehicles...
+            </div>
+            <select id="sortFilter" class="sort-select">
+                <option value="name">Sort by: Name</option>
+                <option value="type">Sort by: Type</option>
+                <option value="seats">Sort by: Seats</option>
+            </select>
+        </div>
+        
+        <!-- Vehicle Grid - 3 cards per row with Book Now button on each card -->
+        <div class="vehicles-grid" id="vehiclesGrid">
+            <!-- Skeleton Loading -->
+            <div class="skeleton" style="height: 450px;"></div>
+            <div class="skeleton" style="height: 450px;"></div>
+            <div class="skeleton" style="height: 450px;"></div>
+        </div>
+        
+        <!-- No Results -->
+        <div class="no-results hidden" id="noResults">
+            <i class="fas fa-car"></i>
+            <h3>No Vehicles Found</h3>
+            <p>Try adjusting your filters to find what you're looking for.</p>
+            <button onclick="clearAllFilters()" class="btn-outline">Clear Filters</button>
+        </div>
+        
+        <!-- Load More -->
+        <div class="load-more-container" id="loadMoreContainer">
+            <button class="btn-load-more" onclick="loadMoreVehicles()" id="loadMoreBtn">
+                Load More Vehicles
+            </button>
+        </div>
+    </main>
+    
+    <!-- Image Gallery Modal -->
+    <div class="gallery-modal" id="galleryModal" onclick="closeGallery()">
+        <div class="gallery-content" onclick="event.stopPropagation()">
+            <button class="gallery-close" onclick="closeGallery()">✕</button>
+            <button class="gallery-nav gallery-prev" onclick="prevImage()">❮</button>
+            <img class="gallery-image" id="galleryImage" src="" alt="Vehicle">
+            <button class="gallery-nav gallery-next" onclick="nextImage()">❯</button>
+            <div class="gallery-counter" id="galleryCounter"></div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>ABI Rentals</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/pages/vehicles.html">Vehicles</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li><i class="fas fa-phone"></i> +63 912 345 6789</li>
+                    <li><i class="fas fa-envelope"></i> info@abirentals.com</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <ul>
+                    <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Privacy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ABI Car & Van Rental. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ========== GLOBAL VARIABLES ==========
+        let allVehicles = [];
+        let filteredVehicles = [];
+        let currentPage = 1;
+        const vehiclesPerPage = 6;
+        let currentUser = null;
+        let currentImageIndex = 0;
+        let currentImageGallery = [];
+
+        // ========== CHECK LOGIN STATUS ==========
+        (function checkAuth() {
+            const userStr = localStorage.getItem('user');
+            const token = localStorage.getItem('token');
+            
+            if (userStr && token) {
+                try {
+                    currentUser = JSON.parse(userStr);
+                } catch (e) {
+                    currentUser = null;
+                }
+            }
+            updateAuthSection();
+        })();
+
+        function updateAuthSection() {
+            const navAuth = document.getElementById('navAuth');
+            
+            if (currentUser) {
+                let dashboardUrl = '/pages/dashboard/client.html';
+                if (currentUser.role === 'admin') dashboardUrl = '/pages/dashboard/admin.html';
+                if (currentUser.role === 'staff') dashboardUrl = '/pages/dashboard/staff.html';
+                
+                navAuth.innerHTML = `<a href="${dashboardUrl}" class="btn-outline"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</a>`;
+            } else {
+                navAuth.innerHTML = `<a href="/pages/renter-login.html" class="btn-outline"><i class="fas fa-key mr-2"></i>Sign In</a>`;
+            }
+        }
+
+        // ========== LOAD VEHICLES ==========
+        async function loadVehicles() {
+            try {
+                const response = await fetch('/api/vehicles');
+                allVehicles = await response.json();
+                filteredVehicles = [...allVehicles];
+                currentPage = 1;
+                displayVehicles();
+                updateResultsCount();
+            } catch (error) {
+                console.error('Error loading vehicles:', error);
+                document.getElementById('vehiclesGrid').innerHTML = `
+                    <div class="no-results" style="grid-column: 1/-1;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error Loading Vehicles</h3>
+                        <p>Please try again later.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ========== DISPLAY VEHICLES ==========
+        function displayVehicles() {
+            const grid = document.getElementById('vehiclesGrid');
+            const start = 0;
+            const end = currentPage * vehiclesPerPage;
+            const vehiclesToShow = filteredVehicles.slice(0, end);
+            
+            if (filteredVehicles.length === 0) {
+                document.getElementById('noResults').classList.remove('hidden');
+                grid.innerHTML = '';
+                document.getElementById('loadMoreContainer').classList.add('hidden');
+                return;
+            }
+            
+            document.getElementById('noResults').classList.add('hidden');
+            
+            grid.innerHTML = vehiclesToShow.map(vehicle => `
+                <div class="vehicle-card">
+                    <div class="vehicle-image-container" onclick="openVehicleGallery(${vehicle.id})">
+                        <img src="${vehicle.images && vehicle.images[0] ? vehicle.images[0] : 'https://via.placeholder.com/400x250?text=' + (vehicle.brand || '') + ' ' + (vehicle.model || '')}" 
+                             alt="${vehicle.brand || ''} ${vehicle.model || ''}" 
+                             class="vehicle-image">
+                        <span class="vehicle-type-badge">${vehicle.type || 'car'}</span>
+                        ${vehicle.images && vehicle.images.length > 1 ? 
+                            `<span class="image-count-badge" onclick="event.stopPropagation(); openVehicleGallery(${vehicle.id})">
+                                <i class="fas fa-images"></i> ${vehicle.images.length}
+                            </span>` : ''
+                        }
+                    </div>
+                    <div class="vehicle-content">
+                        <h3 class="vehicle-name">${vehicle.brand || ''} ${vehicle.model || ''} ${vehicle.year || ''}</h3>
+                        
+                        <div class="vehicle-details">
+                            <span class="vehicle-detail"><i class="fas fa-palette"></i> ${vehicle.color || 'N/A'}</span>
+                            <span class="vehicle-detail"><i class="fas fa-users"></i> ${vehicle.seats || '?'} seats</span>
+                            <span class="vehicle-detail"><i class="fas fa-cog"></i> ${vehicle.transmission || 'manual'}</span>
+                            <span class="vehicle-detail"><i class="fas fa-gas-pump"></i> ${vehicle.fuelType || 'gasoline'}</span>
+                        </div>
+                        
+                        <div class="vehicle-specs">
+                            <div class="vehicle-spec">
+                                <div class="vehicle-spec-value">${vehicle.seats || '?'}</div>
+                                <div class="vehicle-spec-label">Seats</div>
+                            </div>
+                            <div class="vehicle-spec">
+                                <div class="vehicle-spec-value">${vehicle.transmission || 'manual'}</div>
+                                <div class="vehicle-spec-label">Gear</div>
+                            </div>
+                            <div class="vehicle-spec">
+                                <div class="vehicle-spec-value">${vehicle.fuelType || 'gas'}</div>
+                                <div class="vehicle-spec-label">Fuel</div>
+                            </div>
+                        </div>
+                        
+                        <div class="vehicle-footer">
+                            <span class="vehicle-plate"><i class="fas fa-id-card mr-2"></i>${vehicle.plateNumber || 'No plate'}</span>
+                            <button class="btn-book" onclick="window.location.href='/pages/booking.html?vehicle=${vehicle.id}'">
+                                <i class="fas fa-calendar-check"></i> Book Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Show/hide load more button
+            if (vehiclesToShow.length >= filteredVehicles.length) {
+                document.getElementById('loadMoreContainer').classList.add('hidden');
+            } else {
+                document.getElementById('loadMoreContainer').classList.remove('hidden');
+            }
+        }
+
+        // ========== VEHICLE GALLERY ==========
+        window.openVehicleGallery = function(vehicleId) {
+            const vehicle = allVehicles.find(v => v.id === vehicleId);
+            if (!vehicle) return;
+            
+            // Store images for gallery
+            currentImageGallery = vehicle.images && vehicle.images.length > 0 ? 
+                vehicle.images : ['https://via.placeholder.com/800x600?text=' + (vehicle.brand || '') + ' ' + (vehicle.model || '')];
+            currentImageIndex = 0;
+            
+            // Show gallery
+            showImage(currentImageIndex);
+            document.getElementById('galleryModal').classList.add('active');
+        };
+
+        function showImage(index) {
+            const img = document.getElementById('galleryImage');
+            img.src = currentImageGallery[index];
+            document.getElementById('galleryCounter').textContent = 
+                `${index + 1} / ${currentImageGallery.length}`;
+        }
+
+        window.nextImage = function() {
+            currentImageIndex = (currentImageIndex + 1) % currentImageGallery.length;
+            showImage(currentImageIndex);
+        };
+
+        window.prevImage = function() {
+            currentImageIndex = (currentImageIndex - 1 + currentImageGallery.length) % currentImageGallery.length;
+            showImage(currentImageIndex);
+        };
+
+        window.closeGallery = function() {
+            document.getElementById('galleryModal').classList.remove('active');
+        };
+
+        // ========== FILTER FUNCTIONS ==========
+        function filterVehicles() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const transmissionFilter = document.getElementById('transmissionFilter').value;
+            const seatsFilter = document.getElementById('seatsFilter').value;
+            
+            filteredVehicles = allVehicles.filter(vehicle => {
+                // Search filter
+                const matchesSearch = searchTerm === '' || 
+                    (vehicle.brand && vehicle.brand.toLowerCase().includes(searchTerm)) ||
+                    (vehicle.model && vehicle.model.toLowerCase().includes(searchTerm)) ||
+                    (vehicle.color && vehicle.color.toLowerCase().includes(searchTerm));
+                
+                // Type filter
+                const matchesType = typeFilter === 'all' || vehicle.type === typeFilter;
+                
+                // Transmission filter
+                const matchesTransmission = transmissionFilter === 'all' || vehicle.transmission === transmissionFilter;
+                
+                // Seats filter
+                let matchesSeats = true;
+                if (seatsFilter === '5') matchesSeats = vehicle.seats <= 5;
+                else if (seatsFilter === '7') matchesSeats = vehicle.seats >= 6 && vehicle.seats <= 7;
+                else if (seatsFilter === '8') matchesSeats = vehicle.seats >= 8;
+                
+                return matchesSearch && matchesType && matchesTransmission && matchesSeats;
+            });
+            
+            // Sort
+            const sortBy = document.getElementById('sortFilter').value;
+            filteredVehicles.sort((a, b) => {
+                if (sortBy === 'name') return ((a.brand || '') + (a.model || '')).localeCompare((b.brand || '') + (b.model || ''));
+                if (sortBy === 'type') return (a.type || '').localeCompare(b.type || '');
+                if (sortBy === 'seats') return (a.seats || 0) - (b.seats || 0);
+                return 0;
+            });
+            
+            currentPage = 1;
+            displayVehicles();
+            updateResultsCount();
+            updateActiveFilters();
+        }
+
+        function updateResultsCount() {
+            document.getElementById('resultsCount').innerHTML = 
+                `Showing <span>${Math.min(currentPage * vehiclesPerPage, filteredVehicles.length)}</span> of <span>${filteredVehicles.length}</span> vehicles`;
+        }
+
+        function updateActiveFilters() {
+            const filters = [];
+            const searchTerm = document.getElementById('searchInput').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const transmissionFilter = document.getElementById('transmissionFilter').value;
+            const seatsFilter = document.getElementById('seatsFilter').value;
+            
+            if (searchTerm) filters.push(`Search: "${searchTerm}"`);
+            if (typeFilter !== 'all') filters.push(`Type: ${typeFilter}`);
+            if (transmissionFilter !== 'all') filters.push(`Transmission: ${transmissionFilter}`);
+            if (seatsFilter !== 'all') filters.push(`Seats: ${seatsFilter}`);
+            
+            const container = document.getElementById('activeFilters');
+            if (filters.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            container.innerHTML = filters.map(filter => `
+                <span class="filter-tag">
+                    ${filter}
+                    <i class="fas fa-times" onclick="removeFilter('${filter.split(':')[0].toLowerCase().trim()}')"></i>
+                </span>
+            `).join('') + 
+            `<button class="clear-filters" onclick="clearAllFilters()">Clear All</button>`;
+        }
+
+        window.removeFilter = function(filterType) {
+            if (filterType === 'search') document.getElementById('searchInput').value = '';
+            if (filterType === 'type') document.getElementById('typeFilter').value = 'all';
+            if (filterType === 'transmission') document.getElementById('transmissionFilter').value = 'all';
+            if (filterType === 'seats') document.getElementById('seatsFilter').value = 'all';
+            
+            filterVehicles();
+        };
+
+        window.clearAllFilters = function() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = 'all';
+            document.getElementById('transmissionFilter').value = 'all';
+            document.getElementById('seatsFilter').value = 'all';
+            document.getElementById('sortFilter').value = 'name';
+            
+            filterVehicles();
+        };
+
+        // ========== LOAD MORE ==========
+        window.loadMoreVehicles = function() {
+            currentPage++;
+            displayVehicles();
+            updateResultsCount();
+        };
+
+        // ========== EVENT LISTENERS ==========
+        document.getElementById('searchInput').addEventListener('input', filterVehicles);
+        document.getElementById('typeFilter').addEventListener('change', filterVehicles);
+        document.getElementById('transmissionFilter').addEventListener('change', filterVehicles);
+        document.getElementById('seatsFilter').addEventListener('change', filterVehicles);
+        document.getElementById('sortFilter').addEventListener('change', filterVehicles);
+
+        // ========== KEYBOARD NAVIGATION ==========
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('galleryModal').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') prevImage();
+                if (e.key === 'ArrowRight') nextImage();
+                if (e.key === 'Escape') closeGallery();
+            }
+        });
+
+        // ========== INITIALIZE ==========
+        document.addEventListener('DOMContentLoaded', loadVehicles);
+    </script>
+</body>
+</html>

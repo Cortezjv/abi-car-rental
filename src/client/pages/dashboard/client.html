@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>My Dashboard - ABI Car Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; overflow-x: hidden; }
+        
+        /* Sidebar Styles */
+        .sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); will-change: transform; z-index: 100; }
+        .sidebar-link { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; cursor: pointer; display: flex; align-items: center; padding: 0.5rem 0.75rem; border-radius: 0.5rem; margin-bottom: 0.25rem; color: #e2e8f0; }
+        .sidebar-link i { width: 1.5rem; font-size: 1rem; }
+        .sidebar-link:hover { background-color: #1e40af; color: white; }
+        .sidebar-link.active { background-color: #1e3a8a; color: white; }
+        .sidebar-link.active::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background-color: #ffffff; }
+        
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -280px; transition: left 0.3s ease; z-index: 1000; width: 280px; box-shadow: 4px 0 20px rgba(0,0,0,0.1); height: 100vh; background: #1e3a8a; }
+            .sidebar.open { left: 0; }
+            .main-content { margin-left: 0 !important; width: 100%; }
+            .mobile-menu-btn { display: flex !important; }
+            .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+            .overlay.active { display: block; }
+            .booking-card { padding: 1rem !important; }
+            .booking-details-grid { grid-template-columns: 1fr !important; }
+            .charges-grid { grid-template-columns: 1fr !important; }
+        }
+        
+        .mobile-menu-btn { display: none; position: fixed; top: 0.75rem; left: 0.75rem; z-index: 1001; background: #1e3a8a; color: white; border: none; border-radius: 0.5rem; padding: 0.6rem; cursor: pointer; box-shadow: 0 4px 12px rgba(30,58,138,0.3); align-items: center; justify-content: center; }
+        
+        .status-badge { padding: 4px 12px; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: capitalize; }
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-approved { background-color: #d1fae5; color: #065f46; }
+        .status-active { background-color: #dbeafe; color: #1e40af; }
+        .status-completed { background-color: #e0e7ff; color: #3730a3; }
+        .status-rejected { background-color: #fee2e2; color: #991b1b; }
+        
+        .booking-card { transition: all 0.2s ease; border: 1px solid #e5e7eb; }
+        .booking-card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .booking-header { cursor: pointer; }
+        .booking-details { border-top: 1px solid #e5e7eb; background-color: #f9fafb; }
+        
+        .photo-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem; cursor: pointer; transition: all 0.2s ease; border: 2px solid #e5e7eb; }
+        .photo-thumb:hover { transform: scale(1.05); border-color: #1e3a8a; }
+        
+        .charge-excess { color: #f97316; }
+        .charge-late { color: #dc2626; }
+        
+        .download-btn { background: #1e3a8a; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; transition: all 0.2s ease; }
+        .download-btn:hover { background: #2563eb; transform: scale(1.05); }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 2000; align-items: center; justify-content: center; padding: 16px; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 1rem; max-width: 90vw; max-height: 90vh; overflow: auto; padding: 1rem; animation: scaleIn 0.3s ease; }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        
+        .hidden { display: none; }
+        .cursor-pointer { cursor: pointer; }
+        
+        /* Print styles for download */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; top: 0; left: 0; width: 100%; margin: 0; padding: 20px; }
+            .no-print { display: none; }
+            .download-btn { display: none; }
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleMobileSidebar()"><i class="fas fa-bars"></i></button>
+    <div class="overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+    
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white flex flex-col fixed md:static h-full overflow-y-auto shadow-xl" id="sidebar">
+            <div class="p-4 border-b border-blue-700 flex justify-center"><i class="fas fa-car text-3xl text-blue-200"></i></div>
+            <div class="p-3 border-b border-blue-700 bg-blue-800 bg-opacity-50">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center"><i class="fas fa-user text-sm"></i></div>
+                    <div class="flex-1 min-w-0"><p class="font-semibold text-sm truncate" id="clientName">Client</p><p class="text-xs text-blue-300 truncate">Member</p></div>
+                </div>
+            </div>
+            <nav class="flex-1 p-3 space-y-0.5 overflow-y-auto">
+                <a href="#" onclick="showSection('bookings'); return false;" class="sidebar-link active" id="nav-bookings"><i class="fas fa-calendar-check w-6"></i><span>My Bookings</span><span id="bookingBadge" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full hidden">0</span></a>
+                <a href="#" onclick="showSection('profile'); return false;" class="sidebar-link" id="nav-profile"><i class="fas fa-user-circle w-6"></i><span>My Profile</span></a>
+                <a href="#" onclick="showSection('support'); return false;" class="sidebar-link" id="nav-support"><i class="fas fa-headset w-6"></i><span>Support</span></a>
+                <div class="pt-4 mt-2 border-t border-blue-700"><a href="#" onclick="logout(); return false;" class="sidebar-link flex items-center p-2 rounded-lg hover:bg-red-600 text-sm"><i class="fas fa-sign-out-alt w-6"></i><span>Logout</span></a></div>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 main-content overflow-auto" id="mainContent">
+            <div class="bg-white shadow-sm p-3 flex justify-between items-center sticky top-0 z-10 border-b border-gray-200">
+                <h2 class="text-base md:text-lg font-bold text-gray-800" id="pageTitle">My Bookings</h2>
+                <div class="flex items-center space-x-2">
+                    <button onclick="refreshData()" class="p-1.5 hover:bg-gray-100 rounded-lg"><i class="fas fa-sync-alt text-gray-600 text-sm"></i></button>
+                    <div class="text-right hidden md:block"><p class="text-xs font-semibold text-gray-700" id="currentDateTime"></p></div>
+                </div>
+            </div>
+            
+            <div class="p-3 md:p-4">
+                <!-- Bookings Section -->
+                <div id="section-bookings" class="section-content">
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4">
+                        <div class="stat-card bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-lg shadow p-3"><div class="flex justify-between"><div><p class="text-xs text-blue-100">Total Bookings</p><p class="text-lg font-bold" id="totalBookings">0</p></div><i class="fas fa-calendar-alt text-xl text-blue-300"></i></div></div>
+                        <div class="stat-card bg-gradient-to-br from-yellow-600 to-yellow-800 text-white rounded-lg shadow p-3"><div class="flex justify-between"><div><p class="text-xs text-yellow-100">Pending</p><p class="text-lg font-bold" id="pendingCount">0</p></div><i class="fas fa-clock text-xl text-yellow-300"></i></div></div>
+                        <div class="stat-card bg-gradient-to-br from-green-600 to-green-800 text-white rounded-lg shadow p-3"><div class="flex justify-between"><div><p class="text-xs text-green-100">Active</p><p class="text-lg font-bold" id="activeCount">0</p></div><i class="fas fa-car text-xl text-green-300"></i></div></div>
+                        <div class="stat-card bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-lg shadow p-3"><div class="flex justify-between"><div><p class="text-xs text-purple-100">Completed</p><p class="text-lg font-bold" id="completedCount">0</p></div><i class="fas fa-check-circle text-xl text-purple-300"></i></div></div>
+                    </div>
+                    
+                    <!-- Filter Tabs -->
+                    <div class="flex flex-wrap gap-2 mb-4 border-b pb-2">
+                        <button onclick="filterBookings('all')" class="filter-tab px-4 py-2 text-sm rounded-full bg-blue-800 text-white" id="filterAll">All</button>
+                        <button onclick="filterBookings('pending')" class="filter-tab px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700" id="filterPending">Pending</button>
+                        <button onclick="filterBookings('approved')" class="filter-tab px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700" id="filterApproved">Approved</button>
+                        <button onclick="filterBookings('active')" class="filter-tab px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700" id="filterActive">Active</button>
+                        <button onclick="filterBookings('completed')" class="filter-tab px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700" id="filterCompleted">Completed</button>
+                        <button onclick="filterBookings('rejected')" class="filter-tab px-4 py-2 text-sm rounded-full bg-gray-200 text-gray-700" id="filterRejected">Rejected</button>
+                    </div>
+                    
+                    <!-- Bookings List -->
+                    <div id="bookingsList" class="space-y-4">
+                        <div class="text-center py-8 text-gray-500">Loading your bookings...</div>
+                    </div>
+                </div>
+                
+                <!-- Profile Section -->
+                <div id="section-profile" class="section-content hidden">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h3 class="text-base font-bold mb-4">My Profile</h3>
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-blue-800 rounded-full flex items-center justify-center text-white text-2xl"><i class="fas fa-user"></i></div>
+                            <div class="ml-4"><h2 class="text-xl font-bold" id="profileName">Loading...</h2><p class="text-gray-500">Member since <span id="memberSince">2024</span></p></div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="text-xs text-gray-500">Full Name</label><p class="font-medium" id="profileFullName">-</p></div>
+                            <div><label class="text-xs text-gray-500">Phone Number</label><p class="font-medium" id="profilePhone">-</p></div>
+                            <div><label class="text-xs text-gray-500">Email</label><p class="font-medium" id="profileEmail">-</p></div>
+                            <div><label class="text-xs text-gray-500">Address</label><p class="font-medium" id="profileAddress">-</p></div>
+                            <div><label class="text-xs text-gray-500">Facebook Name</label><p class="font-medium" id="profileFacebook">-</p></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Support Section -->
+                <div id="section-support" class="section-content hidden">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h3 class="text-base font-bold mb-4">Support & Help</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-blue-50 rounded-lg"><i class="fas fa-phone-alt text-blue-800 text-xl w-8"></i><div><p class="text-sm text-gray-500">Call Us</p><p class="font-semibold">+63 912 345 6789</p></div></div>
+                            <div class="flex items-center p-3 bg-green-50 rounded-lg"><i class="fab fa-facebook text-blue-600 text-xl w-8"></i><div><p class="text-sm text-gray-500">Facebook</p><p class="font-semibold">@abirentals</p></div></div>
+                            <div class="flex items-center p-3 bg-purple-50 rounded-lg"><i class="fab fa-messenger text-purple-600 text-xl w-8"></i><div><p class="text-sm text-gray-500">Messenger</p><p class="font-semibold">m.me/abirentals</p></div></div>
+                        </div>
+                        <div class="mt-6"><h4 class="font-semibold mb-3">Frequently Asked Questions</h4>
+                            <div class="space-y-2"><details class="p-3 bg-gray-50 rounded-lg"><summary class="font-medium cursor-pointer">How do I book a vehicle?</summary><p class="text-sm text-gray-600 mt-2">Browse our vehicles, select your desired vehicle, and click "Book Now". Fill in the required information and submit your booking request.</p></details>
+                            <details class="p-3 bg-gray-50 rounded-lg"><summary class="font-medium cursor-pointer">How is the price determined?</summary><p class="text-sm text-gray-600 mt-2">Our admin will contact you to discuss the final price based on your rental duration and vehicle choice.</p></details>
+                            <details class="p-3 bg-gray-50 rounded-lg"><summary class="font-medium cursor-pointer">What documents do I need?</summary><p class="text-sm text-gray-600 mt-2">A valid driver's license and one government-issued ID are required.</p></details></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Image Modal for Photos -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content"><img id="modalImage" src="" alt="Full size" class="max-w-full max-h-[80vh]"><button onclick="closeImageModal()" class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-8 h-8">✕</button></div>
+    </div>
+
+    <script>
+        let currentUser = null, token = localStorage.getItem('token');
+        let allBookings = [], filteredBookings = [];
+        let currentFilter = 'all';
+        
+        // ========== CHECK AUTH ==========
+        (function checkAuth() {
+            const userStr = localStorage.getItem('user');
+            if (!userStr || !token) { window.location.href = '/pages/renter-login.html'; return; }
+            try {
+                currentUser = JSON.parse(userStr);
+                if (currentUser.role !== 'client') {
+                    if (currentUser.role === 'admin') window.location.href = '/pages/dashboard/admin.html';
+                    if (currentUser.role === 'staff') window.location.href = '/pages/dashboard/staff.html';
+                    return;
+                }
+                document.getElementById('clientName').textContent = currentUser.fullname || currentUser.username || 'Client';
+                loadProfile();
+                loadBookings();
+            } catch(e) { window.location.href = '/pages/renter-login.html'; }
+        })();
+        
+        window.toggleMobileSidebar = function() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('active'); };
+        
+        window.showSection = function(section) {
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`section-${section}`).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+            document.getElementById(`nav-${section}`).classList.add('active');
+            const titles = { bookings: 'My Bookings', profile: 'My Profile', support: 'Support' };
+            document.getElementById('pageTitle').textContent = titles[section];
+            if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
+        };
+        
+        function loadProfile() {
+            document.getElementById('profileName').textContent = currentUser.fullname || 'N/A';
+            document.getElementById('profileFullName').textContent = currentUser.fullname || 'N/A';
+            document.getElementById('profilePhone').textContent = currentUser.phone || 'N/A';
+            document.getElementById('profileEmail').textContent = currentUser.email || 'N/A';
+            document.getElementById('profileAddress').textContent = currentUser.address || 'Not provided';
+            document.getElementById('profileFacebook').textContent = currentUser.facebook || currentUser.fbname || 'Not provided';
+            document.getElementById('memberSince').textContent = currentUser.createdAt ? new Date(currentUser.createdAt).getFullYear() : '2024';
+        }
+        
+        async function loadBookings() {
+            try {
+                const res = await fetch('/api/my-bookings', { headers: { 'Authorization': `Bearer ${token}` } });
+                allBookings = await res.json();
+                filteredBookings = [...allBookings];
+                updateStats();
+                displayBookings();
+            } catch(e) { console.error('Error loading bookings:', e); }
+        }
+        
+        function updateStats() {
+            document.getElementById('totalBookings').textContent = allBookings.length;
+            document.getElementById('pendingCount').textContent = allBookings.filter(b => b.status === 'pending').length;
+            document.getElementById('activeCount').textContent = allBookings.filter(b => b.status === 'active').length;
+            document.getElementById('completedCount').textContent = allBookings.filter(b => b.status === 'completed').length;
+            const badge = document.getElementById('bookingBadge');
+            const pendingCount = allBookings.filter(b => b.status === 'pending').length;
+            if(pendingCount > 0) { badge.textContent = pendingCount; badge.classList.remove('hidden'); }
+            else badge.classList.add('hidden');
+        }
+        
+        window.filterBookings = function(status) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-tab').forEach(btn => { btn.classList.remove('bg-blue-800', 'text-white'); btn.classList.add('bg-gray-200', 'text-gray-700'); });
+            if(status === 'all') document.getElementById('filterAll').classList.add('bg-blue-800', 'text-white');
+            else if(status === 'pending') document.getElementById('filterPending').classList.add('bg-blue-800', 'text-white');
+            else if(status === 'approved') document.getElementById('filterApproved').classList.add('bg-blue-800', 'text-white');
+            else if(status === 'active') document.getElementById('filterActive').classList.add('bg-blue-800', 'text-white');
+            else if(status === 'completed') document.getElementById('filterCompleted').classList.add('bg-blue-800', 'text-white');
+            else if(status === 'rejected') document.getElementById('filterRejected').classList.add('bg-blue-800', 'text-white');
+            
+            if(status === 'all') filteredBookings = [...allBookings];
+            else filteredBookings = allBookings.filter(b => b.status === status);
+            displayBookings();
+        };
+        
+        function displayBookings() {
+            const container = document.getElementById('bookingsList');
+            if(!filteredBookings.length) { container.innerHTML = '<div class="text-center py-8 bg-white rounded-lg shadow"><i class="fas fa-calendar-times text-5xl text-gray-300 mb-3"></i><p class="text-gray-600">No bookings found</p><a href="/pages/vehicles.html" class="inline-block mt-4 bg-blue-800 text-white px-6 py-2 rounded-lg">Browse Vehicles</a></div>'; return; }
+            
+            container.innerHTML = filteredBookings.map(booking => {
+                const distance = (booking.odoStart && booking.odoReturn) ? (booking.odoReturn - booking.odoStart) : null;
+                const hasTracking = booking.odoStart || booking.odoReturn || booking.dashboardPhoto || booking.returnDashboardPhoto;
+                const statusClass = `status-${booking.status || 'pending'}`;
+                const statusText = booking.status || 'pending';
+                const isExpanded = false;
+                
+                return `
+                    <div class="booking-card bg-white rounded-lg shadow overflow-hidden" id="booking-${booking.id}">
+                        <div class="booking-header p-4 cursor-pointer" onclick="toggleBookingDetails(${booking.id})">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">${booking.bookingNumber}</span>
+                                        <span class="status-badge ${statusClass}">${statusText}</span>
+                                    </div>
+                                    <h3 class="font-bold text-base">${booking.vehicleName || 'Vehicle'}</h3>
+                                    <p class="text-xs text-gray-500">${booking.startDate || 'N/A'} → ${booking.endDate || 'N/A'}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold text-blue-800">₱${booking.price || 0}</p>
+                                    <p class="text-xs text-gray-500">Total</p>
+                                    <i class="fas fa-chevron-down text-gray-400 mt-1 transition-transform" id="chevron-${booking.id}"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="details-${booking.id}" class="booking-details hidden p-4 border-t">
+                            <!-- Vehicle Information -->
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-sm mb-2 flex items-center"><i class="fas fa-car text-blue-800 mr-2 text-xs"></i>Vehicle Information</h4>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                                    <div><span class="text-gray-500">Brand:</span> ${booking.vehicleBrand || 'N/A'}</div>
+                                    <div><span class="text-gray-500">Model:</span> ${booking.vehicleModel || 'N/A'}</div>
+                                    <div><span class="text-gray-500">Color:</span> ${booking.vehicleColor || 'N/A'}</div>
+                                    <div><span class="text-gray-500">Plate:</span> ${booking.vehiclePlate || 'N/A'}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Rental Schedule -->
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-sm mb-2 flex items-center"><i class="fas fa-calendar-alt text-blue-800 mr-2 text-xs"></i>Rental Schedule</h4>
+                                <div class="grid grid-cols-2 gap-2 text-sm">
+                                    <div><span class="text-gray-500">Pickup:</span> ${booking.startDate || 'N/A'} at ${booking.pickupTime || 'N/A'}</div>
+                                    <div><span class="text-gray-500">Return:</span> ${booking.endDate || 'N/A'} at ${booking.pickupTime || 'N/A'}</div>
+                                    <div><span class="text-gray-500">Delivery:</span> ${booking.deliveryOption === 'pickup' ? 'Pickup at Branch' : 'Delivery to Address'}</div>
+                                    <div><span class="text-gray-500">Driver:</span> ${booking.driverOption === 'with' ? 'With Driver' : 'Self Drive'}</div>
+                                </div>
+                            </div>
+                            
+                            ${hasTracking ? `
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-sm mb-2 flex items-center"><i class="fas fa-tachometer-alt text-blue-800 mr-2 text-xs"></i>Rental Tracking</h4>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm bg-gray-50 p-3 rounded">
+                                    <div><span class="text-gray-500">Start ODO:</span> <span class="font-medium">${booking.odoStart || 'Not recorded'} km</span></div>
+                                    <div><span class="text-gray-500">Start Fuel:</span> <span class="font-medium">${booking.fuelStart || 'Not recorded'}</span></div>
+                                    <div><span class="text-gray-500">Return ODO:</span> <span class="font-medium">${booking.odoReturn || 'Not recorded'} km</span></div>
+                                    <div><span class="text-gray-500">Return Fuel:</span> <span class="font-medium">${booking.fuelReturn || 'Not recorded'}</span></div>
+                                    ${distance !== null ? `<div><span class="text-gray-500">Distance Traveled:</span> <span class="font-medium">${distance} km</span></div>` : ''}
+                                    <div><span class="text-gray-500">Excess KM Charge:</span> <span class="font-medium charge-excess">₱${booking.excessKM || 0}</span></div>
+                                    <div><span class="text-gray-500">Late Fee:</span> <span class="font-medium charge-late">₱${booking.lateFee || 0}</span></div>
+                                    <div><span class="text-gray-500">Car Wash Fee:</span> <span class="font-medium">₱${booking.carwashFee || 0}</span></div>
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Dashboard Photos -->
+                            ${(booking.dashboardPhoto || booking.returnDashboardPhoto) ? `
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-sm mb-2 flex items-center"><i class="fas fa-camera text-blue-800 mr-2 text-xs"></i>Dashboard Photos</h4>
+                                <div class="flex flex-wrap gap-3">
+                                    ${booking.dashboardPhoto ? `<div class="text-center"><img src="${booking.dashboardPhoto}" class="photo-thumb" onclick="openImageModal('${booking.dashboardPhoto}')"><p class="text-xs text-gray-500 mt-1">Pickup Dashboard</p></div>` : ''}
+                                    ${booking.returnDashboardPhoto ? `<div class="text-center"><img src="${booking.returnDashboardPhoto}" class="photo-thumb" onclick="openImageModal('${booking.returnDashboardPhoto}')"><p class="text-xs text-gray-500 mt-1">Return Dashboard</p></div>` : ''}
+                                </div>
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Driver's License -->
+                            ${booking.licenseImage ? `
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-sm mb-2 flex items-center"><i class="fas fa-id-card text-blue-800 mr-2 text-xs"></i>Driver's License</h4>
+                                <img src="${booking.licenseImage}" class="max-h-32 rounded border cursor-pointer" onclick="openImageModal('${booking.licenseImage}')">
+                            </div>
+                            ` : ''}
+                            
+                            <!-- Charges Summary -->
+                            <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+                                <h4 class="font-semibold text-sm mb-2">💰 Total Charges</h4>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                                    <div><span class="text-gray-500">Base Price:</span> ₱${booking.price || 0}</div>
+                                    <div><span class="text-gray-500">Excess KM:</span> ₱${booking.excessKM || 0}</div>
+                                    <div><span class="text-gray-500">Late Fee:</span> ₱${booking.lateFee || 0}</div>
+                                    <div><span class="text-gray-500">Car Wash:</span> ₱${booking.carwashFee || 0}</div>
+                                    <div class="col-span-2 md:col-span-4 pt-2 border-t border-blue-200"><span class="font-bold">TOTAL:</span> <span class="font-bold text-blue-800">₱${(booking.price || 0) + (booking.excessKM || 0) + (booking.lateFee || 0) + (booking.carwashFee || 0)}</span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end gap-2 pt-2 border-t">
+                                <button onclick="event.stopPropagation(); downloadBookingAsImage(${booking.id})" class="download-btn"><i class="fas fa-download mr-1"></i>Download as Image</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        window.toggleBookingDetails = function(id) {
+            const details = document.getElementById(`details-${id}`);
+            const chevron = document.getElementById(`chevron-${id}`);
+            if(details.classList.contains('hidden')) {
+                details.classList.remove('hidden');
+                chevron.classList.add('fa-chevron-up');
+                chevron.classList.remove('fa-chevron-down');
+            } else {
+                details.classList.add('hidden');
+                chevron.classList.add('fa-chevron-down');
+                chevron.classList.remove('fa-chevron-up');
+            }
+        };
+        
+        window.openImageModal = function(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').classList.remove('hidden');
+            document.getElementById('imageModal').classList.add('active');
+        };
+        
+        window.closeImageModal = function() {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.getElementById('imageModal').classList.remove('active');
+        };
+        
+        window.downloadBookingAsImage = async function(bookingId) {
+            const bookingCard = document.getElementById(`booking-${bookingId}`);
+            const details = document.getElementById(`details-${bookingId}`);
+            const wasHidden = details.classList.contains('hidden');
+            
+            if(wasHidden) {
+                details.classList.remove('hidden');
+                const chevron = document.getElementById(`chevron-${bookingId}`);
+                if(chevron) { chevron.classList.add('fa-chevron-up'); chevron.classList.remove('fa-chevron-down'); }
+                await new Promise(r => setTimeout(r, 100));
+            }
+            
+            try {
+                const canvas = await html2canvas(bookingCard, { scale: 2, backgroundColor: '#ffffff' });
+                const link = document.createElement('a');
+                link.download = `ABI_Booking_${bookingId}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            } catch(e) { console.error('Error generating image:', e); alert('Error generating image'); }
+            
+            if(wasHidden) {
+                details.classList.add('hidden');
+                const chevron = document.getElementById(`chevron-${bookingId}`);
+                if(chevron) { chevron.classList.add('fa-chevron-down'); chevron.classList.remove('fa-chevron-up'); }
+            }
+        };
+        
+        window.refreshData = function() { loadBookings(); };
+        window.logout = function() { localStorage.clear(); window.location.href = '/pages/renter-login.html'; };
+        function updateDateTime() { document.getElementById('currentDateTime').textContent = new Date().toLocaleString(); }
+        setInterval(updateDateTime, 1000); updateDateTime();
+        
+        document.addEventListener('click', function(e) { if(e.target === document.getElementById('imageModal')) closeImageModal(); });
+        document.addEventListener('DOMContentLoaded', () => { showSection('bookings'); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renter Access - ABI Car Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #1e3a8a, #3b82f6, #93c5fd);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo i {
+            font-size: 48px;
+            color: #1e3a8a;
+            background: #e0e7ff;
+            padding: 20px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+        .logo p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e7ff;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-top: 20px;
+            display: none;
+        }
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            display: block;
+        }
+        .message.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            display: block;
+        }
+        .otp-input {
+            letter-spacing: 8px;
+            font-size: 28px;
+            text-align: center;
+            font-weight: 700;
+            padding: 16px;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .resend-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .resend-link span {
+            color: #1e3a8a;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .resend-link span.disabled {
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+        .timer {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .staff-link {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e7ff;
+        }
+        .staff-link a {
+            color: #1e3a8a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .staff-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="logo">
+            <i class="fas fa-car"></i>
+            <h1>ABI Car Rental</h1>
+            <p>Enter your phone number to continue</p>
+        </div>
+
+        <!-- Step 1: Phone Number Input -->
+        <div id="step1" class="step active">
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" id="phone" class="form-input" placeholder="0912 345 6789" maxlength="13">
+            </div>
+            
+            <button onclick="sendOTP()" id="sendOtpBtn" class="btn-primary">
+                <i class="fas fa-paper-plane mr-2"></i>Continue with Phone
+            </button>
+            
+            <div id="step1Message" class="message"></div>
+        </div>
+
+        <!-- Step 2: OTP Verification -->
+        <div id="step2" class="step">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="background: #e0e7ff; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-shield-alt" style="font-size: 30px; color: #1e3a8a;"></i>
+                </div>
+                <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 5px;">Verification Code</h2>
+                <p style="color: #666; font-size: 14px;">We've sent a 6-digit code to</p>
+                <p style="font-weight: 700; font-size: 16px; color: #1e3a8a;" id="displayPhone"></p>
+            </div>
+            
+            <div class="form-group">
+                <input type="text" id="otp" class="form-input otp-input" maxlength="6" placeholder="000000">
+            </div>
+            
+            <button onclick="verifyOTP()" id="verifyOtpBtn" class="btn-primary">
+                <i class="fas fa-check-circle mr-2"></i>Verify & Continue
+            </button>
+            
+            <div class="timer" id="timer">Resend available in <span id="countdown">60</span>s</div>
+            
+            <div class="resend-link">
+                <span onclick="resendOTP()" id="resendLink">Resend Code</span>
+            </div>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <span style="color: #666; font-size: 14px; cursor: pointer;" onclick="goToStep1()">
+                    <i class="fas fa-arrow-left mr-1"></i>Use different number
+                </span>
+            </div>
+            
+            <div id="step2Message" class="message"></div>
+        </div>
+
+        <!-- Step 3: Welcome / Registration Complete -->
+        <div id="step3" class="step">
+            <div style="text-align: center; padding: 20px 0;">
+                <div style="background: #dcfce7; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <i class="fas fa-check-circle" style="font-size: 40px; color: #166534;"></i>
+                </div>
+                <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 10px;">Welcome!</h2>
+                <p style="color: #666; margin-bottom: 20px;" id="welcomeMessage"></p>
+                <div class="loading-spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #1e3a8a; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"></div>
+                <p style="color: #999; font-size: 14px;">Redirecting to your dashboard...</p>
+            </div>
+        </div>
+
+        <!-- Staff/Admin Link -->
+        <div class="staff-link">
+            <a href="/pages/staff-login.html">← Staff or Admin? Login here</a>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script>
+        let phoneNumber = '';
+        let countdownInterval;
+        let timerSeconds = 60;
+
+        // ========== STEP NAVIGATION ==========
+        function goToStep1() {
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.remove('active');
+            clearInterval(countdownInterval);
+        }
+
+        function goToStep2() {
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('step3').classList.remove('active');
+            startTimer();
+        }
+
+        function goToStep3() {
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.add('active');
+        }
+
+        // ========== PHONE FORMATTING ==========
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            // Format: 0912 345 6789
+            if (value.length > 4) {
+                value = value.slice(0,4) + ' ' + value.slice(4);
+            }
+            if (value.length > 8) {
+                value = value.slice(0,8) + ' ' + value.slice(8);
+            }
+            e.target.value = value;
+        });
+
+        // ========== SEND OTP ==========
+        async function sendOTP() {
+            const phone = document.getElementById('phone').value.replace(/\s/g, '');
+            
+            if (!phone || phone.length < 10) {
+                showMessage('step1Message', 'Please enter a valid phone number', 'error');
+                return;
+            }
+            
+            phoneNumber = phone;
+            
+            const btn = document.getElementById('sendOtpBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+            
+            try {
+                const response = await fetch('/api/auth/renter-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('displayPhone').textContent = formatPhoneDisplay(phone);
+                    goToStep2();
+                    
+                    // For development: auto-fill OTP
+                    if (data.dev_otp) {
+                        document.getElementById('otp').value = data.dev_otp;
+                    }
+                    
+                    showMessage('step2Message', 'Verification code sent!', 'success');
+                } else {
+                    showMessage('step1Message', data.error || 'Failed to send code', 'error');
+                }
+            } catch (error) {
+                showMessage('step1Message', 'Connection error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Continue with Phone';
+            }
+        }
+
+        // ========== VERIFY OTP ==========
+        async function verifyOTP() {
+            const otp = document.getElementById('otp').value;
+            
+            if (!otp || otp.length !== 6) {
+                showMessage('step2Message', 'Please enter 6-digit code', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('verifyOtpBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Verifying...';
+            
+            try {
+                const response = await fetch('/api/auth/renter-verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phoneNumber, otp })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Save token and user data
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    document.getElementById('welcomeMessage').textContent = 
+                        `Welcome back, ${data.user.fullname || 'Guest'}!`;
+                    
+                    goToStep3();
+                    
+                    // Redirect to client dashboard
+                    setTimeout(() => {
+                        window.location.href = '/pages/dashboard/client.html';
+                    }, 2000);
+                } else {
+                    showMessage('step2Message', data.error || 'Invalid verification code', 'error');
+                }
+            } catch (error) {
+                showMessage('step2Message', 'Connection error', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>Verify & Continue';
+            }
+        }
+
+        // ========== RESEND OTP ==========
+        async function resendOTP() {
+            const resendLink = document.getElementById('resendLink');
+            if (resendLink.classList.contains('disabled')) return;
+            
+            resendLink.classList.add('disabled');
+            
+            try {
+                const response = await fetch('/api/auth/renter-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phoneNumber })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.dev_otp) {
+                        document.getElementById('otp').value = data.dev_otp;
+                    }
+                    showMessage('step2Message', 'New code sent!', 'success');
+                    resetTimer();
+                } else {
+                    showMessage('step2Message', data.error || 'Failed to resend', 'error');
+                }
+            } catch (error) {
+                showMessage('step2Message', 'Connection error', 'error');
+            }
+        }
+
+        // ========== TIMER FUNCTIONS ==========
+        function startTimer() {
+            timerSeconds = 60;
+            document.getElementById('countdown').textContent = timerSeconds;
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('resendLink').classList.add('disabled');
+            
+            countdownInterval = setInterval(() => {
+                timerSeconds--;
+                document.getElementById('countdown').textContent = timerSeconds;
+                
+                if (timerSeconds <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('timer').style.display = 'none';
+                    document.getElementById('resendLink').classList.remove('disabled');
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(countdownInterval);
+            startTimer();
+        }
+
+        // ========== UTILITY FUNCTIONS ==========
+        function showMessage(elementId, text, type) {
+            const msg = document.getElementById(elementId);
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            msg.style.display = 'block';
+            
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 5000);
+        }
+
+        function formatPhoneDisplay(phone) {
+            // Format: 0912 345 6789
+            if (phone.length === 11) {
+                return phone.slice(0,4) + ' ' + phone.slice(4,7) + ' ' + phone.slice(7);
+            }
+            return phone;
+        }
+
+        // OTP input auto-format
+        document.getElementById('otp').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+            
+            // Auto-submit when 6 digits entered
+            if (this.value.length === 6) {
+                verifyOTP();
+            }
+        });
+
+        // Enter key support
+        document.getElementById('phone').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendOTP();
+            }
+        });
+
+        document.getElementById('otp').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyOTP();
+            }
+        });
+    </script>
+</body>
+</html>

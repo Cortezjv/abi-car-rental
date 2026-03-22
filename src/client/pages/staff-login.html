@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff & Admin Login - ABI Car Rental</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .card-header i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #94a3b8;
+        }
+        
+        .card-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .card-header p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .card-body {
+            padding: 40px 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #1e293b;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.1);
+        }
+        
+        .form-input::placeholder {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .message {
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+        
+        .message.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            display: block;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 24px 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .divider span {
+            padding: 0 10px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-link a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        
+        .back-link a:hover {
+            color: #1e293b;
+        }
+        
+        .demo-credentials {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        
+        .demo-credentials p {
+            color: #334155;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .demo-credentials ul {
+            list-style: none;
+            color: #64748b;
+        }
+        
+        .demo-credentials li {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .demo-credentials i {
+            color: #1e293b;
+            width: 16px;
+        }
+        
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            color: #64748b;
+            font-size: 12px;
+        }
+        
+        .security-badge i {
+            color: #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="card-header">
+                <i class="fas fa-user-shield"></i>
+                <h1>Staff & Admin Portal</h1>
+                <p>Secure access for authorized personnel only</p>
+            </div>
+            
+            <div class="card-body">
+                <div id="loginMessage" class="message"></div>
+                
+                <form onsubmit="handleStaffLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Email or Phone Number</label>
+                        <input type="text" id="identifier" class="form-input" 
+                               placeholder="admin@abirentals.com or 09123456789"
+                               autocomplete="username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" id="password" class="form-input" 
+                               placeholder="••••••••"
+                               autocomplete="current-password">
+                    </div>
+                    
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In to Dashboard
+                    </button>
+                </form>
+                
+                <div class="divider">
+                    <span>Demo Credentials</span>
+                </div>
+                
+                <div class="demo-credentials">
+                    <p><i class="fas fa-info-circle mr-2"></i>Test Accounts</p>
+                    <ul>
+                        <li>
+                            <i class="fas fa-user-cog"></i>
+                            <strong>Admin:</strong> admin@abirentals.com / admin123
+                        </li>
+                        <li>
+                            <i class="fas fa-user-tie"></i>
+                            <strong>Staff:</strong> staff@abirentals.com / staff123
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="security-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure • Role-based access • Encrypted</span>
+                </div>
+                
+                <div class="back-link">
+                    <a href="/">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Access Buttons for Testing -->
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="quickFillAdmin()" class="text-xs bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition" style="backdrop-filter: blur(4px);">
+                <i class="fas fa-user-cog mr-2"></i>Fill Admin
+            </button>
+            <button onclick="quickFillStaff()" class="text-xs bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition" style="backdrop-filter: blur(4px);">
+                <i class="fas fa-user-tie mr-2"></i>Fill Staff
+            </button>
+        </div>
+    </div>
+
+    <script>
+        async function handleStaffLogin(event) {
+            event.preventDefault();
+            
+            const identifier = document.getElementById('identifier').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!identifier || !password) {
+                showMessage('Please enter both email/phone and password', 'error');
+                return;
+            }
+            
+            // Disable button and show loading
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Authenticating...';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ identifier, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Check if user is staff or admin
+                    if (data.user.role !== 'admin' && data.user.role !== 'staff') {
+                        showMessage('Access denied. This portal is for staff and admin only.', 'error');
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                        return;
+                    }
+                    
+                    // Store authentication
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    showMessage('Login successful! Redirecting...', 'success');
+                    
+                    // Redirect based on role
+                    setTimeout(() => {
+                        if (data.user.role === 'admin') {
+                            window.location.href = '/pages/dashboard/admin.html';
+                        } else {
+                            window.location.href = '/pages/dashboard/staff.html';
+                        }
+                    }, 1500);
+                } else {
+                    showMessage(data.error || 'Invalid credentials', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (error) {
+                showMessage('Connection error. Please try again.', 'error');
+                console.error('Login error:', error);
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('loginMessage');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 5000);
+        }
+
+        // Quick fill functions for testing
+        function quickFillAdmin() {
+            document.getElementById('identifier').value = 'admin@abirentals.com';
+            document.getElementById('password').value = 'admin123';
+        }
+
+        function quickFillStaff() {
+            document.getElementById('identifier').value = 'staff@abirentals.com';
+            document.getElementById('password').value = 'staff123';
+        }
+
+        // Enter key support
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleStaffLogin(e);
+            }
+        });
+
+        // Clear message when typing
+        document.getElementById('identifier').addEventListener('input', function() {
+            document.getElementById('loginMessage').style.display = 'none';
+        });
+        
+        document.getElementById('password').addEventListener('input', function() {
+            document.getElementById('loginMessage').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
